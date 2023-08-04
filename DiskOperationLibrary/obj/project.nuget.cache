@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "h+rPtruRiiUQYk1UAMsuqnjtxB1dHRqYdUQrsWiRsAllea+ziywMCQdD5PActm0f3lA6JsQrDSaqraH+0VzSgA==",
+  "success": true,
+  "projectFilePath": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ADITYA\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

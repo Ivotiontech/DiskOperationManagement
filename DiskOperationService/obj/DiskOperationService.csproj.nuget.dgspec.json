@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj": {}
+    "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj": {}
   },
   "projects": {
-    "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj": {
+    "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj",
-        "projectName": "DiskOperationService",
-        "projectPath": "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\obj\\",
+        "projectUniqueName": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
+        "projectName": "DiskOperationLibrary",
+        "projectPath": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
+        "packagesPath": "C:\\Users\\ADITYA\\.nuget\\packages\\",
+        "outputPath": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\ADITYA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,12 +22,79 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {},
+          "https://pkgs.dev.azure.com/aalgro/aalgro-core/_packaging/aalgro-core-feed/nuget/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj",
+        "projectName": "DiskOperationService",
+        "projectPath": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationService\\DiskOperationService.csproj",
+        "packagesPath": "C:\\Users\\ADITYA\\.nuget\\packages\\",
+        "outputPath": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationService\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\ADITYA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://pkgs.dev.azure.com/aalgro/aalgro-core/_packaging/aalgro-core-feed/nuget/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj": {
+                "projectPath": "C:\\Aditya_Project\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -85,7 +148,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }
