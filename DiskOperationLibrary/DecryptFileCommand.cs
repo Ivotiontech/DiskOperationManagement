@@ -12,13 +12,8 @@ namespace DiskOperationLibrary
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
 
-        const string EncrFolder = @"F:\Encrypt\";
         const string DecrFolder = @"C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationService\logs";
-        const string SrcFolder = @"c:\docs\";
-
-        const string PubKeyFile = @"F:\Encrypt\rsaPublicKey.txt";
-
-        const string KeyName = "Key01";
+       const string KeyName = "Key01";
 
         private void CreateAsmKeys()
         {
@@ -29,19 +24,14 @@ namespace DiskOperationLibrary
                 PersistKeyInCsp = true
             };
         }
-        private void DecryptFile(string fileInfo)
+        public void DecryptFile(string fileInfo)
         { 
             CreateAsmKeys();
-            _cspp.KeyContainerName = KeyName;
-            _rsa = new RSACryptoServiceProvider(_cspp)
-            {
-                PersistKeyInCsp = true
-            };
-
+            
             // Create instance of Aes for
             // symmetric decryption of the data.
             Aes aes = Aes.Create();
-            var fileName = Path.GetFileName(fileInfo);
+            var fileName = new FileInfo(fileInfo);
             var fileFullName = Path.GetFullPath(fileInfo);
             // Create byte arrays to get the length of
             // the encrypted key and IV.
@@ -52,7 +42,7 @@ namespace DiskOperationLibrary
 
             // Construct the file name for the decrypted file.
             string outFile =
-                Path.ChangeExtension(fileFullName.Replace("log", "log1"), ".txt");
+                Path.ChangeExtension(fileFullName, fileName.Extension);
 
             // Use FileStream objects to read the encrypted
             // file (inFs) and save the decrypted file (outFs).

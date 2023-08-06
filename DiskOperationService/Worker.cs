@@ -7,12 +7,15 @@ using System.Runtime.CompilerServices;
 using System.Management;
 using DiskOperationLibrary;
 using Newtonsoft.Json;
+using Microsoft.Extensions.FileSystemGlobbing;
+using System.Net.Sockets;
 
 namespace DiskOperationService
 {
     public class Worker : BackgroundService
     {
         int isStart = 0;
+        private FileSystemWatcher _watcher;
         static string externaldrive = string.Empty;
         private readonly ILogger<Worker> _logger;
         private readonly string fileFullName = @"C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationService\LicenseKey.txt";
@@ -29,6 +32,7 @@ namespace DiskOperationService
         {
             try
             {
+                Dispose();
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     int index = 0;
@@ -58,20 +62,20 @@ namespace DiskOperationService
 
 
                             // Create a new FileSystemWatcher instance
-                            FileSystemWatcher watcher = new FileSystemWatcher(fileToRead);
+                            _watcher = new FileSystemWatcher(fileToRead);
 
                             // Set the properties to monitor
-                            watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+                            _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
                             // Set the events to track
-                            watcher.Created += OnCreated;
-                            watcher.Changed += OnChanged;
-                            watcher.Deleted += OnDeleted;
-                            watcher.Renamed += OnRenamed;
+                            _watcher.Created += OnCreated;
+                            _watcher.Changed += OnChanged;
+                            _watcher.Deleted += OnDeleted;
+                            _watcher.Renamed += OnRenamed;
 
                             // Start monitoring
-                            watcher.EnableRaisingEvents = true;
+                            _watcher.EnableRaisingEvents = true;
 
                             //Console.WriteLine("Press enter to stop monitoring.");
                             //Console.ReadLine();
@@ -83,17 +87,17 @@ namespace DiskOperationService
                         {
 
                             // Create a new FileSystemWatcher instance
-                            FileSystemWatcher watcher = new FileSystemWatcher(fileToRead);
+                            _watcher = new FileSystemWatcher(fileToRead);
 
                             // Set the properties to monitor
-                            watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+                            _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
                             // Set the events to track
-                            watcher.Created += OnCreated1;
+                            _watcher.Created += OnCreated1;
 
                             // Start monitoring
-                            watcher.EnableRaisingEvents = true;
+                            _watcher.EnableRaisingEvents = true;
                         }
 
                     }
@@ -159,6 +163,19 @@ namespace DiskOperationService
             return base.StopAsync(cancellationToken);
         }
 
+        public void Dispose()
+        {
+            try
+            {
+                _watcher?.Dispose();
+            }
+            catch
+            {
+                ;
+            }
+            _watcher = null;
+        }
+
 
         private static void OnCreated(object sender, FileSystemEventArgs e)
         {
@@ -180,6 +197,7 @@ namespace DiskOperationService
                     File.WriteAllText(myfile, jsonString);
                     EncryptFileCommand encryptFile = new EncryptFileCommand();
                     encryptFile.EncryptFile(myfile);
+                    TCPFileUpload(myfile);
                 }
                 catch (Exception ex)
                 {
@@ -208,6 +226,7 @@ namespace DiskOperationService
                     File.WriteAllText(myfile, jsonString);
                     EncryptFileCommand encryptFile = new EncryptFileCommand();
                     encryptFile.EncryptFile(myfile);
+                    TCPFileUpload(myfile);
                 }
                 catch (Exception ex)
                 {
@@ -236,6 +255,7 @@ namespace DiskOperationService
                     File.WriteAllText(myfile, jsonString);
                     EncryptFileCommand encryptFile = new EncryptFileCommand();
                     encryptFile.EncryptFile(myfile);
+                    TCPFileUpload(myfile);
                 }
                 catch (Exception ex)
                 {
@@ -264,6 +284,7 @@ namespace DiskOperationService
                     File.WriteAllText(myfile, jsonString);
                     EncryptFileCommand encryptFile = new EncryptFileCommand();
                     encryptFile.EncryptFile(myfile);
+                    TCPFileUpload(myfile);
                 }
                 catch (Exception ex)
                 {
@@ -288,6 +309,7 @@ namespace DiskOperationService
                     File.WriteAllText(myfile, jsonString);
                     EncryptFileCommand encryptFile = new EncryptFileCommand();
                     encryptFile.EncryptFile(myfile);
+                    TCPFileUpload(myfile);
                 }
                 catch (Exception ex)
                 {
@@ -316,6 +338,37 @@ namespace DiskOperationService
 
         }
 
+        private static void TCPFileUpload(string filePath) {
+            string serverIP = "84.46.255.85";
+            int serverPort = 5141;
+            DecryptFileCommand decryptFile =  new DecryptFileCommand();
+            decryptFile.DecryptFile(filePath);
+            try
+            {
+                using (TcpClient client = new TcpClient(serverIP, serverPort))
+                {
+                    Console.WriteLine("Connected to the server.");
+
+                    using (NetworkStream networkStream = client.GetStream())
+                    using (FileStream fileStream = File.OpenRead(filePath))
+                    {
+                        // Read the file and send its content over the network stream
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            networkStream.Write(buffer, 0, bytesRead);
+                        }
+
+                        Console.WriteLine("File sent successfully.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+        }
         private static void OnUpdateLog()
         {
 
@@ -328,6 +381,7 @@ namespace DiskOperationService
                 File.WriteAllText(myfile, jsonString);
                 EncryptFileCommand encryptFile = new EncryptFileCommand();
                 encryptFile.EncryptFile(myfile);
+                TCPFileUpload(myfile);
                 dynamicsList.Clear();
             }
             catch (Exception ex)
