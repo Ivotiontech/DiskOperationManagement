@@ -12,7 +12,7 @@ namespace DiskOperationLibrary
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
 
-        const string DecrFolder = @"C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationService\logs";
+        const string DecrFolder = @"F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationService\logs";
        const string KeyName = "Key01";
 
         private void CreateAsmKeys()

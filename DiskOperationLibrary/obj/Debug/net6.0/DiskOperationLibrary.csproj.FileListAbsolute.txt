@@ -10,3 +10,15 @@ C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationL
 C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\refint\DiskOperationLibrary.dll
 C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.pdb
 C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\ref\DiskOperationLibrary.dll
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\bin\Debug\net6.0\DiskOperationLibrary.deps.json
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\bin\Debug\net6.0\DiskOperationLibrary.dll
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\bin\Debug\net6.0\DiskOperationLibrary.pdb
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.csproj.AssemblyReference.cache
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.GeneratedMSBuildEditorConfig.editorconfig
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.AssemblyInfoInputs.cache
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.AssemblyInfo.cs
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.csproj.CoreCompileInputs.cache
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.dll
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\refint\DiskOperationLibrary.dll
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\DiskOperationLibrary.pdb
+F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\obj\Debug\net6.0\ref\DiskOperationLibrary.dll

@@ -12,7 +12,7 @@ namespace DiskOperationLibrary
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
 
-        const string EncrFolder = @"C:\Aditya_Project\DiskOperationManagement\DiskOperationManagement\DiskOperationService\logs";
+        const string EncrFolder = @"F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationService\logs";
         const string DecrFolder = @"F:\Encrypt\";
         const string SrcFolder = @"c:\docs\";
 

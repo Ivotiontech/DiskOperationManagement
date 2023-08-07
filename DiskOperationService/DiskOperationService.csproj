@@ -17,11 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DiskOperationLibrary\DiskOperationLibrary.csproj" />
+    <Folder Include="FileDataRead\" />
+    <Folder Include="logs\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="FileDataRead\" />
-    <Folder Include="logs\" />
+    <ProjectReference Include="..\DiskOperationLibrary\DiskOperationLibrary.csproj" />
   </ItemGroup>
 </Project>
