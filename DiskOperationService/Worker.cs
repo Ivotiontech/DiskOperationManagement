@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Xml;
 using DiskOperationLibrary;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace DiskOperationService
 {
@@ -196,10 +197,10 @@ namespace DiskOperationService
                 try
                 {
                     // Appending the given texts
-                    File.WriteAllText(myfile, jsonString);
+                   // File.WriteAllText(myfile, jsonString);
                     //EncryptFileCommand encryptFile = new EncryptFileCommand();
                     //encryptFile.EncryptFile(myfile);
-                    TCPFileUpload(myfile);
+                    TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -219,16 +220,11 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-
+                
                 // Appending the given texts
                 try
                 {
-                    // Appending the given texts
-                    File.WriteAllText(myfile, jsonString);
-                    //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                    //encryptFile.EncryptFile(myfile);
-                    TCPFileUpload(myfile);
+                   TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -248,16 +244,11 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-
+                
                 // Appending the given texts
                 try
                 {
-                    // Appending the given texts
-                    File.WriteAllText(myfile, jsonString);
-                    //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                    //encryptFile.EncryptFile(myfile);
-                    TCPFileUpload(myfile);
+                  TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -277,16 +268,11 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-
+               
                 // Appending the given texts
                 try
                 {
-                    // Appending the given texts
-                    File.WriteAllText(myfile, jsonString);
-                    //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                    //encryptFile.EncryptFile(myfile);
-                    TCPFileUpload(myfile);
+                    TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -302,16 +288,11 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-
+               
                 // Appending the given texts
                 try
                 {
-                    // Appending the given texts
-                    File.WriteAllText(myfile, jsonString);
-                    //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                    //encryptFile.EncryptFile(myfile);
-                    TCPFileUpload(myfile);
+                    TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -340,7 +321,7 @@ namespace DiskOperationService
 
         }
 
-        private static void TCPFileUpload(string filePath)
+        private static void TCPFileUpload(dynamic filePath)
         {
             string serverIP = "84.46.255.85";
             int serverPort = 5141;
@@ -351,9 +332,9 @@ namespace DiskOperationService
                 using (TcpClient client = new TcpClient(serverIP, serverPort))
                 {
                     Console.WriteLine("Connected to the server.");
-
+                    byte[] dataBytes = Encoding.UTF8.GetBytes(filePath);
                     using (NetworkStream networkStream = client.GetStream())
-                    using (FileStream fileStream = File.OpenRead(filePath))
+                    using (MemoryStream fileStream = new MemoryStream(dataBytes))
                     {
                         // Read the file and send its content over the network stream
                         byte[] buffer = new byte[1024];
@@ -369,7 +350,11 @@ namespace DiskOperationService
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
+                // Appending the given texts
+                File.WriteAllText(myfile, filePath);
+                EncryptFileCommand encryptFile = new EncryptFileCommand();
+                encryptFile.EncryptFile(myfile);
             }
         }
         private static void OnUpdateLog()
@@ -381,10 +366,10 @@ namespace DiskOperationService
             // Appending the given texts
             try
             {
-                File.WriteAllText(myfile, jsonString);
+                //File.WriteAllText(myfile, jsonString);
                 //EncryptFileCommand encryptFile = new EncryptFileCommand();
                 //encryptFile.EncryptFile(myfile);
-                TCPFileUpload(myfile);
+                TCPFileUpload(jsonString);
                 dynamicsList.Clear();
             }
             catch (Exception ex)
