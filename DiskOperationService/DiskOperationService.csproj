@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PacketDotNet" Version="1.4.7" />
     <PackageReference Include="SharpPcap" Version="6.2.5" />
     <PackageReference Include="System.Management" Version="7.0.2" />
@@ -22,6 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DiskOperationLibrary\DiskOperationLibrary.csproj" />
+    <Reference Include="DiskOprationLib">
+      <HintPath>..\DiskOprationLib\bin\Debug\netstandard2.0\DiskOprationLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

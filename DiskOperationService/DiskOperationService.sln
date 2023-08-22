@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiskOperationService", "Dis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskOperationManagementApp", "..\DiskOperationManagementApp\DiskOperationManagementApp.csproj", "{717E8CCE-2DC2-4A8B-B24F-7E70C509EF3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskOperationLibrary", "..\DiskOperationLibrary\DiskOperationLibrary.csproj", "{C8523376-57FC-472A-B0E6-4178D2E7B927}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiskOperationLibrary", "..\DiskOperationLibrary\DiskOperationLibrary.csproj", "{C8523376-57FC-472A-B0E6-4178D2E7B927}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskOprationLib", "..\DiskOprationLib\DiskOprationLib.csproj", "{8CB86B74-0E99-4DE8-BA63-3C16D075D9BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,9 +26,12 @@ Global
 		{717E8CCE-2DC2-4A8B-B24F-7E70C509EF3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{717E8CCE-2DC2-4A8B-B24F-7E70C509EF3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8523376-57FC-472A-B0E6-4178D2E7B927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8523376-57FC-472A-B0E6-4178D2E7B927}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8523376-57FC-472A-B0E6-4178D2E7B927}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8523376-57FC-472A-B0E6-4178D2E7B927}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CB86B74-0E99-4DE8-BA63-3C16D075D9BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CB86B74-0E99-4DE8-BA63-3C16D075D9BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CB86B74-0E99-4DE8-BA63-3C16D075D9BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CB86B74-0E99-4DE8-BA63-3C16D075D9BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

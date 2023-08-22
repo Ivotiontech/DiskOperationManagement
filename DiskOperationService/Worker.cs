@@ -9,7 +9,7 @@ using System.Management;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System.Net.Sockets;
 using System.Xml;
-using DiskOperationLibrary;
+using DiskOprationLib;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -25,6 +25,8 @@ namespace DiskOperationService
         static string fileToRead = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\FileDataRead";
         static string filesLogs = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\logs";
         private static List<dynamic> dynamicsList;
+
+
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
@@ -46,7 +48,8 @@ namespace DiskOperationService
                     var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
 
                     DriveInfo[] drives = DriveInfo.GetDrives();
-
+                    OnUpdateLog();
+                    GetAllFileFromFolder();
                     //foreach (dynamic path in dt.data.path)
                     //{
                     //var cd = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
@@ -97,7 +100,7 @@ namespace DiskOperationService
                             _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
                             // Set the events to track
-                           // _watcher.Created += OnCreated1;
+                            // _watcher.Created += OnCreated1;
 
                             // Start monitoring
                             _watcher.EnableRaisingEvents = true;
@@ -196,10 +199,6 @@ namespace DiskOperationService
                 // Appending the given texts
                 try
                 {
-                    // Appending the given texts
-                   // File.WriteAllText(myfile, jsonString);
-                    //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                    //encryptFile.EncryptFile(myfile);
                     TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
@@ -220,11 +219,11 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                
+
                 // Appending the given texts
                 try
                 {
-                   TCPFileUpload(jsonString);
+                    TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -244,11 +243,11 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                
+
                 // Appending the given texts
                 try
                 {
-                  TCPFileUpload(jsonString);
+                    TCPFileUpload(jsonString);
                 }
                 catch (Exception ex)
                 {
@@ -268,7 +267,7 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-               
+
                 // Appending the given texts
                 try
                 {
@@ -288,7 +287,7 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-               
+
                 // Appending the given texts
                 try
                 {
@@ -359,23 +358,48 @@ namespace DiskOperationService
         }
         private static void OnUpdateLog()
         {
-
             string jsonString = JsonConvert.SerializeObject(dynamicsList, Newtonsoft.Json.Formatting.Indented);
-            string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-
             // Appending the given texts
             try
             {
-                //File.WriteAllText(myfile, jsonString);
-                //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                //encryptFile.EncryptFile(myfile);
-                TCPFileUpload(jsonString);
-                dynamicsList.Clear();
+                if (dynamicsList.Count != 0)
+                {
+                    TCPFileUpload(jsonString);
+                    dynamicsList.Clear();
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private static void GetAllFileFromFolder()
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(filesLogs, "*", SearchOption.AllDirectories);
+                if (files.Count() > 0)
+                {
+                    foreach (string file in files)
+                    {
+                        var fullNameChanged = Path.GetFileNameWithoutExtension(file) + 1;
+                        DecryptFileCommand decryptFileCommand = new DecryptFileCommand();
+                        decryptFileCommand.DecryptFile(file);
+                        var fullPath = filesLogs + "\\" + fullNameChanged + Path.GetExtension(file);
+                        var data = ReadDataFromFile.ReadFileForSpeceficData(fullPath);
+                        string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                        TCPFileUpload(jsonString);
+                        File.Delete(file);
+                        File.Delete(fullPath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
         }
     }
 }
