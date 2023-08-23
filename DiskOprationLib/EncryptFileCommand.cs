@@ -61,7 +61,7 @@ namespace DiskOprationLib
 
             // Change the file's extension to ".enc"
             string outFile =
-                Path.Combine(EncrFolder, Path.ChangeExtension(file.Name, file.Extension));
+                Path.Combine(file.Directory.FullName, Path.ChangeExtension(file.Name, file.Extension));
 
             using (var outFs = new FileStream(outFile, FileMode.Create))
             {
@@ -99,7 +99,7 @@ namespace DiskOprationLib
                     outStreamEncrypted.FlushFinalBlock();
                 }
             }
-            Directory.CreateDirectory(EncrFolder);
+            //Directory.w(outFile);
             using (var sw = new StreamWriter(PubKeyFile, false))
             {
                 sw.Write(_rsa.ToXmlString(false));

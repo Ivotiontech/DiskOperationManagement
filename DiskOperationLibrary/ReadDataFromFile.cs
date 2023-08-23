@@ -11,12 +11,11 @@ namespace DiskOperationLibrary
     {
         public static dynamic ReadFileForSpeceficData(string fileFullPath)
         {
-            string filePath = fileFullPath;
-
             try
             {
+                
                 // Read all lines from the file
-                string jsonData = File.ReadAllText(filePath);
+                string jsonData = File.ReadAllText(fileFullPath);
 
                 // Deserialize the JSON data into a dynamic object
                 var jsonObject = JsonConvert.DeserializeObject<dynamic>(jsonData);

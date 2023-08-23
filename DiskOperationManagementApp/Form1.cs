@@ -25,6 +25,7 @@ namespace DiskOperationManagementApp
         const string EncrFolder = @"F:\Encrypt\";
         const string DecrFolder = @"F:\Encrypt\";
         const string SrcFolder = @"c:\docs\";
+        private readonly string fileFullName = @"F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationService\LicenseKey.txt";
         static string filesLogs = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\logs";
         const string PubKeyFile = @"F:\Encrypt\rsaPublicKey.txt";
 
@@ -261,13 +262,13 @@ namespace DiskOperationManagementApp
             //var jsonData = ReadDataFromFile.ReadFileForSpeceficData(fileFullName);
             var param = new { lic = lic };
             var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
-            if (dt.data.path != "")
+            var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
+            if (statusCode.ToString() == "200")
             {
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-                // Appending the given texts
-                File.WriteAllText(myfile, param.ToString());
+                
+                File.WriteAllText(fileFullName, param.ToString());
                 EncryptFileCommand encryptFile = new EncryptFileCommand();
-                encryptFile.EncryptFile(myfile);
+                encryptFile.EncryptFile(fileFullName);
                 InstallWorkerService();
             }
             else

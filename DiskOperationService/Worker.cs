@@ -320,18 +320,17 @@ namespace DiskOperationService
 
         }
 
-        private static void TCPFileUpload(dynamic filePath)
+        private static void TCPFileUpload(string filePath)
         {
             string serverIP = "84.46.255.85";
             int serverPort = 5141;
-            DecryptFileCommand decryptFile = new DecryptFileCommand();
-            //decryptFile.DecryptFile(filePath);
+           
             try
             {
                 using (TcpClient client = new TcpClient(serverIP, serverPort))
                 {
                     Console.WriteLine("Connected to the server.");
-                    byte[] dataBytes = Encoding.UTF8.GetBytes(filePath);
+                    byte[] dataBytes = Encoding.UTF8.GetBytes(filePath.ToString()+"--");
                     using (NetworkStream networkStream = client.GetStream())
                     using (MemoryStream fileStream = new MemoryStream(dataBytes))
                     {
