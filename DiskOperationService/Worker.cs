@@ -21,9 +21,9 @@ namespace DiskOperationService
         private FileSystemWatcher _watcher;
         static string externaldrive = string.Empty;
         private readonly ILogger<Worker> _logger;
-        private readonly string fileFullName = @"F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationService\LicenseKey.txt";
-        static string fileToRead = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\FileDataRead";
-        static string filesLogs = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\logs";
+        private readonly string fileFullName = @"LicenseKey.txt";
+        static string fileToRead = "FileDataRead";
+        static string filesLogs = "logs";
         private static List<dynamic> dynamicsList;
 
 
@@ -50,65 +50,65 @@ namespace DiskOperationService
                     DriveInfo[] drives = DriveInfo.GetDrives();
                     OnUpdateLog();
                     GetAllFileFromFolder();
-                    //foreach (dynamic path in dt.data.path)
-                    //{
-                    //var cd = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
-                    var drive = GetDriveFromFilePath(fileToRead);
-                    // Check if the drive is ready and not a network drive
-                    if (drive.IsReady && drive.DriveType != DriveType.Network)
+                    foreach (dynamic path in dt.data.path)
                     {
-
-                        // Exclude external drives (DriveType.Removable)
-                        if (drive.DriveType != DriveType.Removable && isStart == 0)
-                        {
-                            // Perform your desired actions with the non-external drive
-                            //Console.WriteLine("Drive: " + drive.Name);
-                            string systemDrive = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3);
-                            //if (drive.Name == systemDrive) continue;
-
-
-                            // Create a new FileSystemWatcher instance
-                            _watcher = new FileSystemWatcher(fileToRead);
-
-                            // Set the properties to monitor
-                            _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
-
-                            // Set the events to track
-                            _watcher.Created += OnCreated;
-                            _watcher.Changed += OnChanged;
-                            _watcher.Deleted += OnDeleted;
-                            _watcher.Renamed += OnRenamed;
-
-                            // Start monitoring
-                            _watcher.EnableRaisingEvents = true;
-
-                            //Console.WriteLine("Press enter to stop monitoring.");
-                            //Console.ReadLine();
-
-                            //// Stop monitoring
-                            //watcher.EnableRaisingEvents = false;
-                        }
-                        else if (drive.DriveType == DriveType.Removable)
+                        var cd = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
+                        var drive = GetDriveFromFilePath(cd.ToString());
+                        // Check if the drive is ready and not a network drive
+                        if (drive.IsReady && drive.DriveType != DriveType.Network)
                         {
 
-                            // Create a new FileSystemWatcher instance
-                            _watcher = new FileSystemWatcher(fileToRead);
+                            // Exclude external drives (DriveType.Removable)
+                            if (drive.DriveType != DriveType.Removable && isStart == 0)
+                            {
+                                // Perform your desired actions with the non-external drive
+                                //Console.WriteLine("Drive: " + drive.Name);
+                                string systemDrive = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3);
+                                //if (drive.Name == systemDrive) continue;
 
-                            // Set the properties to monitor
-                            _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
-                            // Set the events to track
-                            // _watcher.Created += OnCreated1;
+                                // Create a new FileSystemWatcher instance
+                                _watcher = new FileSystemWatcher(fileToRead);
 
-                            // Start monitoring
-                            _watcher.EnableRaisingEvents = true;
+                                // Set the properties to monitor
+                                _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+
+                                // Set the events to track
+                                _watcher.Created += OnCreated;
+                                _watcher.Changed += OnChanged;
+                                _watcher.Deleted += OnDeleted;
+                                _watcher.Renamed += OnRenamed;
+
+                                // Start monitoring
+                                _watcher.EnableRaisingEvents = true;
+
+                                //Console.WriteLine("Press enter to stop monitoring.");
+                                //Console.ReadLine();
+
+                                //// Stop monitoring
+                                //watcher.EnableRaisingEvents = false;
+                            }
+                            else if (drive.DriveType == DriveType.Removable)
+                            {
+
+                                // Create a new FileSystemWatcher instance
+                                _watcher = new FileSystemWatcher(fileToRead);
+
+                                // Set the properties to monitor
+                                _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+
+                                // Set the events to track
+                                // _watcher.Created += OnCreated1;
+
+                                // Start monitoring
+                                _watcher.EnableRaisingEvents = true;
+                            }
+
                         }
-
+                        index++;
                     }
-                    index++;
-                    //}
                     //await Task.Delay(5000, stoppingToken);
                     //if (dynamicsList.Any())
                     //{
@@ -324,13 +324,13 @@ namespace DiskOperationService
         {
             string serverIP = "84.46.255.85";
             int serverPort = 5141;
-           
+
             try
             {
                 using (TcpClient client = new TcpClient(serverIP, serverPort))
                 {
                     Console.WriteLine("Connected to the server.");
-                    byte[] dataBytes = Encoding.UTF8.GetBytes(filePath.ToString()+"--");
+                    byte[] dataBytes = Encoding.UTF8.GetBytes(filePath.ToString() + "--");
                     using (NetworkStream networkStream = client.GetStream())
                     using (MemoryStream fileStream = new MemoryStream(dataBytes))
                     {

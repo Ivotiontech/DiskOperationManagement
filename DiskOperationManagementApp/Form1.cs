@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Reflection.Emit;
 using System.IO;
 using DiskOprationLib;
+using Newtonsoft.Json;
 
 namespace DiskOperationManagementApp
 {
@@ -22,14 +23,8 @@ namespace DiskOperationManagementApp
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
 
-        const string EncrFolder = @"F:\Encrypt\";
-        const string DecrFolder = @"F:\Encrypt\";
-        const string SrcFolder = @"c:\docs\";
-        private readonly string fileFullName = @"F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationService\LicenseKey.txt";
-        static string filesLogs = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\logs";
-        const string PubKeyFile = @"F:\Encrypt\rsaPublicKey.txt";
 
-        const string KeyName = "Key01";
+        private readonly string fileFullName = @"LicenseKey.txt";
         public Form1()
         {
             InitializeComponent();
@@ -257,6 +252,7 @@ namespace DiskOperationManagementApp
 
         private async void btnAccess_Click(object sender, EventArgs e)
         {
+            var fileinfo = new FileInfo(fileFullName);
             var lic = txtAccessKey.Text;
 
             //var jsonData = ReadDataFromFile.ReadFileForSpeceficData(fileFullName);
@@ -265,8 +261,8 @@ namespace DiskOperationManagementApp
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
             if (statusCode.ToString() == "200")
             {
-                
-                File.WriteAllText(fileFullName, param.ToString());
+                string jsonString = JsonConvert.SerializeObject(param, Newtonsoft.Json.Formatting.Indented);
+                File.WriteAllText(fileinfo.Directory.FullName + fileFullName, jsonString.ToString());
                 EncryptFileCommand encryptFile = new EncryptFileCommand();
                 encryptFile.EncryptFile(fileFullName);
                 InstallWorkerService();

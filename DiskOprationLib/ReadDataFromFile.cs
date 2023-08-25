@@ -12,9 +12,9 @@ namespace DiskOprationLib
         {
             try
             {
-
+                var fileinfo = new FileInfo(fileFullPath);
                 // Read all lines from the file
-                string jsonData = File.ReadAllText(fileFullPath);
+                string jsonData = File.ReadAllText(fileinfo.Directory.FullName+fileFullPath);
 
                 // Deserialize the JSON data into a dynamic object
                 var jsonObject = JsonConvert.DeserializeObject<dynamic>(jsonData);
