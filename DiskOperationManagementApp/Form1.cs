@@ -14,6 +14,7 @@ using System.Reflection.Emit;
 using System.IO;
 using DiskOprationLib;
 using Newtonsoft.Json;
+using System.ServiceProcess;
 
 namespace DiskOperationManagementApp
 {
@@ -22,12 +23,14 @@ namespace DiskOperationManagementApp
 
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
-
+        private ServiceController serviceController;
+        string serviceName = "DiskOperationManagement";
 
         private readonly string fileFullName = @"LicenseKey.txt";
         public Form1()
         {
             InitializeComponent();
+
         }
 
         //private void btnInstall_Click(object sender, EventArgs e)
@@ -252,6 +255,8 @@ namespace DiskOperationManagementApp
 
         private async void btnAccess_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
+            btnAccess.Enabled = false;
             var fileinfo = new FileInfo(fileFullName);
             var lic = txtAccessKey.Text;
 
@@ -261,11 +266,13 @@ namespace DiskOperationManagementApp
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
             if (statusCode.ToString() == "200")
             {
+                var fileDirectory = fileinfo.Directory.FullName.Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0") + "\\" + fileFullName;
                 string jsonString = JsonConvert.SerializeObject(param, Newtonsoft.Json.Formatting.Indented);
-                File.WriteAllText(fileinfo.Directory.FullName + fileFullName, jsonString.ToString());
-                EncryptFileCommand encryptFile = new EncryptFileCommand();
-                encryptFile.EncryptFile(fileFullName);
+                File.WriteAllText(fileDirectory, jsonString.ToString());
+                //EncryptFileCommand encryptFile = new EncryptFileCommand();
+                //encryptFile.EncryptFile(fileDirectory);
                 InstallWorkerService();
+                //this.Close();
             }
             else
             {
@@ -275,30 +282,50 @@ namespace DiskOperationManagementApp
 
         private void InstallWorkerService()
         {
-            // Replace "DiskOperationManagement" with your desired service name.
-            string serviceName = "DiskOperationManagement";
-
-            // Replace "PathToYourWorkerServiceExecutable" with the full path to the Worker Service executable.
-            string servicePath = "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationService\\bin\\Debug\\net6.0\\DiskOperationService.exe";
+            string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0\\DiskOperationService.exe");
 
             try
             {
                 using (ServiceController sc = new ServiceController(serviceName))
                 {
+                    ProcessStartInfo psi = new ProcessStartInfo();
                     if (!ServiceExists(serviceName))
                     {
                         // Use the "sc create" command to install the service.
-                        ProcessStartInfo psi = new ProcessStartInfo("sc", $"create {serviceName} binPath= \"{servicePath}\"");
+                        psi = new ProcessStartInfo("sc", $"create {serviceName} binPath= \"{servicePath}\"");
                         psi.Verb = "runas"; // Run as administrator.
                         Process.Start(psi);
+                        sc.Start();
+                        sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
+                        MessageBox.Show("Service started successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        ProcessStartInfo psi = new ProcessStartInfo("sc", $"delete {serviceName}");
+
+                        if (sc.Status == ServiceControllerStatus.Running)
+                        {
+                            sc.Stop();
+                            sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                            psi = new ProcessStartInfo("sc", $"delete {serviceName}");
+                            psi.Verb = "runas"; // Run as administrator.
+                            Process.Start(psi);
+                        }
+                        else
+                        {
+                            psi = new ProcessStartInfo("sc", $"delete {serviceName}");
+                            psi.Verb = "runas"; // Run as administrator.
+                            Process.Start(psi);
+                        }
+                        // Use the "sc create" command to install the service.
+                        psi = new ProcessStartInfo("sc", $"create {serviceName} binPath= \"{servicePath}\"");
                         psi.Verb = "runas"; // Run as administrator.
                         Process.Start(psi);
+                        sc.Start();
+                        sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+                        MessageBox.Show("Service started successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
+                this.Close();
             }
             catch (Exception ex)
             {

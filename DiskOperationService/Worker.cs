@@ -12,6 +12,10 @@ using System.Xml;
 using DiskOprationLib;
 using Newtonsoft.Json;
 using System.Text;
+using System.Net.NetworkInformation;
+using System.Net.Http;
+using System.Net;
+using Newtonsoft.Json.Linq;
 
 namespace DiskOperationService
 {
@@ -21,11 +25,13 @@ namespace DiskOperationService
         private FileSystemWatcher _watcher;
         static string externaldrive = string.Empty;
         private readonly ILogger<Worker> _logger;
-        private readonly string fileFullName = @"LicenseKey.txt";
-        static string fileToRead = "FileDataRead";
-        static string filesLogs = "logs";
+        private static string fileFullName = @"LicenseKey.txt";
+        private static string fileWorker = @"WorkerLog.txt";
         private static List<dynamic> dynamicsList;
-
+        private static List<dynamic> exceptionTCPJsonString;
+        private static string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0\\");
+        private Timer _timer;
+        static DateTime utcTime;
 
         public Worker(ILogger<Worker> logger)
         {
@@ -38,92 +44,105 @@ namespace DiskOperationService
             try
             {
                 Dispose();
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    int index = 0;
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                    await Task.Delay(1000, stoppingToken);
-                    var jsonData = ReadDataFromFile.ReadFileForSpeceficData(fileFullName);
-                    var param = new { lic = jsonData.lic };
-                    var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
-
-                    DriveInfo[] drives = DriveInfo.GetDrives();
-                    OnUpdateLog();
-                    GetAllFileFromFolder();
-                    foreach (dynamic path in dt.data.path)
+                //GetUTCDateTime();
+                //if (utcTime >= DateTime.Parse("08-09-2023"))
+                //{
+                //    StopServiceCallback(null);
+                //}
+                //else
+                //{
+                //    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
+                    while (!stoppingToken.IsCancellationRequested)
                     {
-                        var cd = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
-                        var drive = GetDriveFromFilePath(cd.ToString());
-                        // Check if the drive is ready and not a network drive
-                        if (drive.IsReady && drive.DriveType != DriveType.Network)
+                        int index = 0;
+
+                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                        await Task.Delay(1000, stoppingToken);
+
+
+
+                        var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
+                        var param = new { lic = jsonData.lic };
+                        var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
+
+                        DriveInfo[] drives = DriveInfo.GetDrives();
+                        OnUpdateLog();
+                        GetAllFileFromFolder();
+                        foreach (dynamic path in dt.data.path)
                         {
-
-                            // Exclude external drives (DriveType.Removable)
-                            if (drive.DriveType != DriveType.Removable && isStart == 0)
-                            {
-                                // Perform your desired actions with the non-external drive
-                                //Console.WriteLine("Drive: " + drive.Name);
-                                string systemDrive = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3);
-                                //if (drive.Name == systemDrive) continue;
-
-
-                                // Create a new FileSystemWatcher instance
-                                _watcher = new FileSystemWatcher(fileToRead);
-
-                                // Set the properties to monitor
-                                _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
-
-                                // Set the events to track
-                                _watcher.Created += OnCreated;
-                                _watcher.Changed += OnChanged;
-                                _watcher.Deleted += OnDeleted;
-                                _watcher.Renamed += OnRenamed;
-
-                                // Start monitoring
-                                _watcher.EnableRaisingEvents = true;
-
-                                //Console.WriteLine("Press enter to stop monitoring.");
-                                //Console.ReadLine();
-
-                                //// Stop monitoring
-                                //watcher.EnableRaisingEvents = false;
-                            }
-                            else if (drive.DriveType == DriveType.Removable)
+                            var driveData = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
+                            var drive = GetDriveFromFilePath(driveData.ToString());
+                            // Check if the drive is ready and not a network drive
+                            if (drive.IsReady && drive.DriveType != DriveType.Network)
                             {
 
-                                // Create a new FileSystemWatcher instance
-                                _watcher = new FileSystemWatcher(fileToRead);
+                                // Exclude external drives (DriveType.Removable)
+                                if (drive.DriveType != DriveType.Removable && isStart == 0)
+                                {
+                                    // Perform your desired actions with the non-external drive
+                                    //Console.WriteLine("Drive: " + drive.Name);
+                                    string systemDrive = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3);
+                                    //if (drive.Name == systemDrive) continue;
 
-                                // Set the properties to monitor
-                                _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
-                                // Set the events to track
-                                // _watcher.Created += OnCreated1;
+                                    // Create a new FileSystemWatcher instance
+                                    _watcher = new FileSystemWatcher(driveData.ToString());
 
-                                // Start monitoring
-                                _watcher.EnableRaisingEvents = true;
+                                    // Set the properties to monitor
+                                    _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                                    _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+
+                                    // Set the events to track
+                                    _watcher.Created += OnCreated;
+                                    _watcher.Changed += OnChanged;
+                                    _watcher.Deleted += OnDeleted;
+                                    _watcher.Renamed += OnRenamed;
+
+                                    // Start monitoring
+                                    _watcher.EnableRaisingEvents = true;
+
+                                    //Console.WriteLine("Press enter to stop monitoring.");
+                                    //Console.ReadLine();
+
+                                    //// Stop monitoring
+                                    //watcher.EnableRaisingEvents = false;
+                                }
+                                else if (drive.DriveType == DriveType.Removable)
+                                {
+
+                                    // Create a new FileSystemWatcher instance
+                                    _watcher = new FileSystemWatcher(driveData.ToString());
+
+                                    // Set the properties to monitor
+                                    _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                                    _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+
+                                    // Set the events to track
+                                    // _watcher.Created += OnCreated1;
+
+                                    // Start monitoring
+                                    _watcher.EnableRaisingEvents = true;
+                                }
+
                             }
-
+                            index++;
+                            // }
+                            //await Task.Delay(5000, stoppingToken);
+                            //if (dynamicsList.Any())
+                            //{
+                            //    OnUpdateLog();
                         }
-                        index++;
+                        isStart = 1;
+                        //Console.WriteLine("Press enter to stop monitoring.");
+                        //Console.ReadLine();
+
+
+                        // Stop monitoring
+                        //watcher.EnableRaisingEvents = false;
+
+
                     }
-                    //await Task.Delay(5000, stoppingToken);
-                    //if (dynamicsList.Any())
-                    //{
-                    //    OnUpdateLog();
-                    //}
-                    isStart = 1;
-                    //Console.WriteLine("Press enter to stop monitoring.");
-                    //Console.ReadLine();
-
-
-                    // Stop monitoring
-                    //watcher.EnableRaisingEvents = false;
-
-
-                }
+               // }
 
             }
             catch (Exception ex)
@@ -134,6 +153,29 @@ namespace DiskOperationService
 
         }
 
+        public void GetUTCDateTime() {
+            string apiUrl = "http://worldtimeapi.org/api/timezone/UTC";
+            try
+            {
+                var httpClient = new HttpClient();
+                // The endpoint you want to request
+                HttpResponseMessage response = httpClient.GetAsync($"{apiUrl}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    // Read the response content as a string
+                    string jsonResponse = response.Content.ReadAsStringAsync().Result;
+                    var data = (JObject)JsonConvert.DeserializeObject(jsonResponse);
+                    string timeZone = data["utc_datetime"].Value<string>();
+
+                    string[] dateString = timeZone.Split('/');
+                    utcTime = Convert.ToDateTime(dateString[1] + "/" + dateString[0] + "/" + dateString[2]);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
 
         static DriveInfo GetDriveFromFilePath(string filePath)
         {
@@ -155,6 +197,13 @@ namespace DiskOperationService
             // If no matching drive is found, return an empty string or throw an exception, depending on your requirement.
             // For simplicity, we will return an empty string in this example.
             return null;
+        }
+
+        private void StopServiceCallback(object state)
+        {
+            _logger.LogInformation("Stopping worker service at: {time}", DateTimeOffset.Now);
+            _timer?.Dispose();
+            StopAsync(CancellationToken.None).Wait();
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
@@ -194,8 +243,7 @@ namespace DiskOperationService
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-
+                
                 // Appending the given texts
                 try
                 {
@@ -341,18 +389,20 @@ namespace DiskOperationService
                         {
                             networkStream.Write(buffer, 0, bytesRead);
                         }
-
+                        var path = servicePath +"\\"+ fileWorker;
+                        if (!File.Exists(path)) {
+                            File.Create(path);
+                        }
+                        var successData = @"File sent successfully on this " + DateTime.Now;
+                        File.AppendAllText(path, successData + Environment.NewLine);
                         Console.WriteLine("File sent successfully.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                string myfile = filesLogs + "//log" + DateTime.UtcNow.Ticks + ".json";
-                // Appending the given texts
-                File.WriteAllText(myfile, filePath);
-                EncryptFileCommand encryptFile = new EncryptFileCommand();
-                encryptFile.EncryptFile(myfile);
+                var jsonObject = JsonConvert.DeserializeObject<dynamic>(filePath);
+                exceptionTCPJsonString.Add(jsonObject);
             }
         }
         private static void OnUpdateLog()
@@ -377,21 +427,11 @@ namespace DiskOperationService
         {
             try
             {
-                string[] files = Directory.GetFiles(filesLogs, "*", SearchOption.AllDirectories);
-                if (files.Count() > 0)
+                string jsonString = JsonConvert.SerializeObject(exceptionTCPJsonString, Newtonsoft.Json.Formatting.Indented);
+                if (exceptionTCPJsonString != null)
                 {
-                    foreach (string file in files)
-                    {
-                        var fullNameChanged = Path.GetFileNameWithoutExtension(file) + 1;
-                        DecryptFileCommand decryptFileCommand = new DecryptFileCommand();
-                        decryptFileCommand.DecryptFile(file);
-                        var fullPath = filesLogs + "\\" + fullNameChanged + Path.GetExtension(file);
-                        var data = ReadDataFromFile.ReadFileForSpeceficData(fullPath);
-                        string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
-                        TCPFileUpload(jsonString);
-                        File.Delete(file);
-                        File.Delete(fullPath);
-                    }
+                    TCPFileUpload(jsonString);
+                    exceptionTCPJsonString.Clear();
                 }
             }
             catch (Exception ex)
