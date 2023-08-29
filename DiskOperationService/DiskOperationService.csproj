@@ -24,8 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DiskOprationLib">
-      <HintPath>..\DiskOprationLib\bin\Debug\netstandard2.0\DiskOprationLib.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\DiskOprationLib\DiskOprationLib.csproj" />
   </ItemGroup>
 </Project>

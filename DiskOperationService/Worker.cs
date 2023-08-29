@@ -44,14 +44,14 @@ namespace DiskOperationService
             try
             {
                 Dispose();
-                //GetUTCDateTime();
-                //if (utcTime >= DateTime.Parse("08-09-2023"))
-                //{
-                //    StopServiceCallback(null);
-                //}
-                //else
-                //{
-                //    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
+                GetUTCDateTime();
+                if (utcTime >= DateTime.Parse("08-09-2023"))
+                {
+                    StopServiceCallback(null);
+                }
+                else
+                {
+                    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
                     while (!stoppingToken.IsCancellationRequested)
                     {
                         int index = 0;
@@ -142,7 +142,7 @@ namespace DiskOperationService
 
 
                     }
-               // }
+               }
 
             }
             catch (Exception ex)
