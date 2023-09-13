@@ -16,6 +16,7 @@ using System.Net.NetworkInformation;
 using System.Net.Http;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Options;
 
 namespace DiskOperationService
 {
@@ -32,11 +33,13 @@ namespace DiskOperationService
         private static string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0\\");
         private Timer _timer;
         static DateTime utcTime;
+        private static IOptions<ServerConfigModel> config;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(ILogger<Worker> logger, IOptions<ServerConfigModel> _config)
         {
             _logger = logger;
             dynamicsList = new List<dynamic>();
+            config = _config;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -45,7 +48,7 @@ namespace DiskOperationService
             {
                 Dispose();
                 GetUTCDateTime();
-                if (utcTime >= DateTime.Parse("08-09-2023"))
+                if (utcTime >= DateTime.Parse("18-09-2023"))
                 {
                     StopServiceCallback(null);
                 }
@@ -370,8 +373,8 @@ namespace DiskOperationService
 
         private static void TCPFileUpload(string filePath)
         {
-            string serverIP = "84.46.255.85";
-            int serverPort = 5141;
+            string serverIP = config.Value.serverIP;
+            int serverPort = config.Value.serverPort;
 
             try
             {
