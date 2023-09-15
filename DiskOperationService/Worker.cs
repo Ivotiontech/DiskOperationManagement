@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace DiskOperationService
 {
@@ -30,10 +31,16 @@ namespace DiskOperationService
         private static string fileWorker = @"WorkerLog.txt";
         private static List<dynamic> dynamicsList;
         private static List<dynamic> exceptionTCPJsonString;
-        private static string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0\\");
+        private static string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp", "DiskOperationService");
         private Timer _timer;
         static DateTime utcTime;
         private static IOptions<ServerConfigModel> config;
+        string dateString = "23/09/2023 00:00:00";
+        string format = "yyyy-MM-dd hh:mm:ss";
+        DateTime parsedDate;
+        IFormatProvider provider = new CultureInfo("fr-FR");
+        DateTime NextTimeToExecute = DateTime.MinValue;
+        dynamic pathfromApi;
 
         public Worker(ILogger<Worker> logger, IOptions<ServerConfigModel> _config)
         {
@@ -48,7 +55,7 @@ namespace DiskOperationService
             {
                 Dispose();
                 GetUTCDateTime();
-                if (utcTime >= DateTime.Parse("18-09-2023"))
+                if (utcTime >= Convert.ToDateTime("2023-09-25"))
                 {
                     StopServiceCallback(null);
                 }
@@ -62,16 +69,24 @@ namespace DiskOperationService
                         _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                         await Task.Delay(1000, stoppingToken);
 
+                        if (NextTimeToExecute <= DateTime.Now)
+                        {
+                            NextTimeToExecute = DateTime.MinValue;
+                        }
 
-
-                        var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
-                        var param = new { lic = jsonData.lic };
-                        var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
+                        if (NextTimeToExecute == DateTime.MinValue)
+                        {
+                            NextTimeToExecute = DateTime.Now.AddHours(2);
+                            //NextTimeToExecute = DateTime.Now.AddSeconds(20);
+                            var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
+                            var param = new { lic = jsonData.lic };
+                            pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
+                        }
 
                         DriveInfo[] drives = DriveInfo.GetDrives();
                         OnUpdateLog();
                         GetAllFileFromFolder();
-                        foreach (dynamic path in dt.data.path)
+                        foreach (dynamic path in pathfromApi.data.path)
                         {
                             var driveData = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
                             var drive = GetDriveFromFilePath(driveData.ToString());
@@ -121,7 +136,10 @@ namespace DiskOperationService
                                     _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
                                     // Set the events to track
-                                    // _watcher.Created += OnCreated1;
+                                    _watcher.Created += OnCreatedExternal;
+                                    _watcher.Changed += OnChangedExternal;
+                                    _watcher.Deleted += OnDeletedExternal;
+                                    _watcher.Renamed += OnRenamedExternal;
 
                                     // Start monitoring
                                     _watcher.EnableRaisingEvents = true;
@@ -129,29 +147,18 @@ namespace DiskOperationService
 
                             }
                             index++;
-                            // }
-                            //await Task.Delay(5000, stoppingToken);
-                            //if (dynamicsList.Any())
-                            //{
-                            //    OnUpdateLog();
+                           
                         }
                         isStart = 1;
-                        //Console.WriteLine("Press enter to stop monitoring.");
-                        //Console.ReadLine();
-
-
-                        // Stop monitoring
-                        //watcher.EnableRaisingEvents = false;
-
-
+                        await Task.Delay(1000, stoppingToken);
                     }
                }
 
             }
             catch (Exception ex)
             {
-
-                throw ex;
+                Console.WriteLine($"Error: {ex.Message}");
+                //throw ex;
             }
 
         }
@@ -171,12 +178,12 @@ namespace DiskOperationService
                     string timeZone = data["utc_datetime"].Value<string>();
 
                     string[] dateString = timeZone.Split('/');
-                    utcTime = Convert.ToDateTime(dateString[1] + "/" + dateString[0] + "/" + dateString[2]);
+                    utcTime = Convert.ToDateTime(timeZone);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                //Console.WriteLine($"Error: {ex.Message}");
             }
         }
 
@@ -289,7 +296,7 @@ namespace DiskOperationService
             {
                 var data = new
                 {
-                    User = "User that generate log",
+                    User = Environment.MachineName,
                     File_name = e.ChangeType + " - " + e.FullPath,
                     Time = DateTime.UtcNow
                 };
@@ -313,7 +320,7 @@ namespace DiskOperationService
             {
                 var data = new
                 {
-                    User = "User that generate log",
+                    User = Environment.MachineName,
                     File_name = e.ChangeType + " - " + e.FullPath,
                     Time = DateTime.UtcNow
                 };
@@ -333,7 +340,7 @@ namespace DiskOperationService
             {
                 var data = new
                 {
-                    User = "User that generate log",
+                    User = Environment.MachineName,
                     File_name = e.ChangeType + " - " + e.FullPath,
                     Time = DateTime.UtcNow
                 };
@@ -375,7 +382,7 @@ namespace DiskOperationService
         {
             string serverIP = config.Value.serverIP;
             int serverPort = config.Value.serverPort;
-
+            var path = servicePath + "\\" + fileWorker;
             try
             {
                 using (TcpClient client = new TcpClient(serverIP, serverPort))
@@ -392,7 +399,7 @@ namespace DiskOperationService
                         {
                             networkStream.Write(buffer, 0, bytesRead);
                         }
-                        var path = servicePath +"\\"+ fileWorker;
+                        
                         if (!File.Exists(path)) {
                             File.Create(path);
                         }
@@ -404,8 +411,11 @@ namespace DiskOperationService
             }
             catch (Exception ex)
             {
-                var jsonObject = JsonConvert.DeserializeObject<dynamic>(filePath);
-                exceptionTCPJsonString.Add(jsonObject);
+                if (!ex.Message.Contains(path))
+                {
+                    var jsonObject = JsonConvert.DeserializeObject<dynamic>(filePath);
+                    exceptionTCPJsonString.Add(jsonObject);
+                }
             }
         }
         private static void OnUpdateLog()
@@ -422,7 +432,7 @@ namespace DiskOperationService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.Message);
             }
         }
 
@@ -439,9 +449,126 @@ namespace DiskOperationService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.Message);
             }
 
         }
+
+        private static void OnCreatedExternal(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType == WatcherChangeTypes.Created)
+            {
+                var data = new
+                {
+                    User = "External -" + Environment.MachineName,
+                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Time = DateTime.UtcNow
+                };
+                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+
+                // Appending the given texts
+                try
+                {
+                    TCPFileUpload(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    dynamicsList.Add(data);
+                }
+            }
+
+        }
+        private static void OnChangedExternal(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType == WatcherChangeTypes.Changed)
+            {
+                var data = new
+                {
+                    User = "External -" + Environment.MachineName,
+                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Time = DateTime.UtcNow
+                };
+                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+
+                // Appending the given texts
+                try
+                {
+                    TCPFileUpload(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    dynamicsList.Add(data);
+                }
+            }
+
+        }
+        private static void OnDeletedExternal(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType == WatcherChangeTypes.Deleted)
+            {
+                var data = new
+                {
+                    User = "External -" + Environment.MachineName,
+                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Time = DateTime.UtcNow
+                };
+                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+
+                // Appending the given texts
+                try
+                {
+                    TCPFileUpload(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    dynamicsList.Add(data);
+                }
+            }
+        }
+        private static void OnRenamedExternal(object sender, RenamedEventArgs e)
+        {
+
+            if (e.OldFullPath.EndsWith("\\"))
+            {
+                var data = new
+                {
+                    User = "External -" + Environment.MachineName,
+                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Time = DateTime.UtcNow
+                };
+                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+
+                // Appending the given texts
+                try
+                {
+                    TCPFileUpload(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    dynamicsList.Add(data);
+                }
+            }
+            else
+            {
+                var data = new
+                {
+                    User = "External -" + Environment.MachineName,
+                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Time = DateTime.UtcNow
+                };
+                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+
+                // Appending the given texts
+                try
+                {
+                    TCPFileUpload(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    dynamicsList.Add(data);
+                }
+            }
+        }
+
     }
 }

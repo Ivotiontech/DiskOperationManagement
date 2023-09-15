@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.txtAccessKey = new System.Windows.Forms.TextBox();
             this.btnAccess = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -62,8 +63,10 @@
             this.ClientSize = new System.Drawing.Size(388, 79);
             this.Controls.Add(this.btnAccess);
             this.Controls.Add(this.txtAccessKey);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Disk Operation System";
             this.ResumeLayout(false);
             this.PerformLayout();

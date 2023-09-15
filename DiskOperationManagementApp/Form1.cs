@@ -47,7 +47,7 @@ namespace DiskOperationManagementApp
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
             if (statusCode.ToString() == "200")
             {
-                var fileDirectory = fileinfo.Directory.FullName.Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0") + "\\" + fileFullName;
+                var fileDirectory = fileinfo.Directory.FullName.Replace("DiskOperationManagementApp", "DiskOperationService") + "\\" + fileFullName;
                 string jsonString = JsonConvert.SerializeObject(param, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(fileDirectory, jsonString.ToString());
                 //EncryptFileCommand encryptFile = new EncryptFileCommand();
@@ -63,7 +63,7 @@ namespace DiskOperationManagementApp
 
         private void InstallWorkerService()
         {
-            string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp\\bin\\Debug", "DiskOperationService\\bin\\Debug\\net6.0\\DiskOperationService.exe");
+            string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp", "DiskOperationService\\DiskOperationService.exe");
 
             try
             {
@@ -77,9 +77,9 @@ namespace DiskOperationManagementApp
                         psi.Verb = "runas"; // Run as administrator.
                         Process.Start(psi);
                         //MessageBox.Show("1");
-                        Thread.Sleep(2000);
+                        Thread.Sleep(5000);
                         sc.Start();
-                        Thread.Sleep(2000);
+                        Thread.Sleep(5000);
                         //MessageBox.Show("2");
                         sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
                         MessageBox.Show("Service started successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -100,17 +100,17 @@ namespace DiskOperationManagementApp
                             psi = new ProcessStartInfo("sc", $"delete {serviceName}");
                             psi.Verb = "runas"; // Run as administrator.
                             Process.Start(psi);
-                            Thread.Sleep(2000);
+                            Thread.Sleep(5000);
                         }
                         // Use the "sc create" command to install the service.
                         psi = new ProcessStartInfo("sc", $"create {serviceName} binPath= \"{servicePath}\"");
                         psi.Verb = "runas"; // Run as administrator.
                         Process.Start(psi);
                         //MessageBox.Show("3");
-                        Thread.Sleep(2000);
+                        Thread.Sleep(5000);
                         sc.Start();
                         //MessageBox.Show("4");
-                        Thread.Sleep(2000);
+                        Thread.Sleep(5000);
                         sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
                         MessageBox.Show("Service started successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
