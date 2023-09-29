@@ -7,7 +7,7 @@
     <ProjectGuid>{717E8CCE-2DC2-4A8B-B24F-7E70C509EF3B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>DiskOperationManagementApp</RootNamespace>
-    <AssemblyName>DiskOperationManagementApp</AssemblyName>
+    <AssemblyName>Legallogger</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -25,7 +25,7 @@ namespace DiskOperationManagementApp
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
         private ServiceController serviceController;
-        string serviceName = "DiskOperationManagement";
+        string serviceName = "LegalDLP-Beta";
 
         private readonly string fileFullName = @"LicenseKey.txt";
         public Form1()
@@ -47,7 +47,7 @@ namespace DiskOperationManagementApp
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
             if (statusCode.ToString() == "200")
             {
-                var fileDirectory = fileinfo.Directory.FullName.Replace("DiskOperationManagementApp", "DiskOperationService") + "\\" + fileFullName;
+                var fileDirectory = fileinfo.Directory.FullName.Replace("LegalloggerApp", "LegalDLP-Beta") + "\\" + fileFullName;
                 string jsonString = JsonConvert.SerializeObject(param, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(fileDirectory, jsonString.ToString());
                 //EncryptFileCommand encryptFile = new EncryptFileCommand();
@@ -63,7 +63,7 @@ namespace DiskOperationManagementApp
 
         private void InstallWorkerService()
         {
-            string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp", "DiskOperationService\\DiskOperationService.exe");
+            string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP-Beta\\LegalDLP-Beta.exe");
 
             try
             {

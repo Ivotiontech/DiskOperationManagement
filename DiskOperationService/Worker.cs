@@ -28,7 +28,7 @@ using System.Reflection.Metadata;
 using System.Security.Principal;
 using System.ComponentModel;
 
-namespace DiskOperationService
+namespace LegalDLPBeta
 {
     public class Worker : BackgroundService
     {
@@ -40,7 +40,7 @@ namespace DiskOperationService
         private static string fileWorker = @"WorkerLog.txt";
         private static List<dynamic> dynamicsList;
         private static List<dynamic> exceptionTCPJsonString;
-        private static string servicePath = Directory.GetCurrentDirectory().Replace("DiskOperationManagementApp", "DiskOperationService");
+        private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP-Beta");
         private Timer _timer;
         static DateTime utcTime;
         private static IOptions<ServerConfigModel> config;

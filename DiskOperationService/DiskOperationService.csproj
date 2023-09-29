@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-DiskOperationService-d23dae99-b21c-4063-8580-352a349116da</UserSecretsId>
+    <AssemblyName>LegalDLP-Beta</AssemblyName>
+    <RootNamespace>LegalDLPBeta</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
