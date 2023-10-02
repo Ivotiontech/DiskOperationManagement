@@ -67,44 +67,46 @@ namespace LegalDLPBeta
             {
                 Dispose();
                 GetUTCDateTime();
-                if (utcTime >= Convert.ToDateTime("2023-09-25"))
+                //if (utcTime >= Convert.ToDateTime("2023-09-25"))
+                //{
+                //    StopServiceCallback(null);
+                //}
+                //else
+                //{
+                // _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    StopServiceCallback(null);
-                }
-                else
-                {
-                    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
-                    while (!stoppingToken.IsCancellationRequested)
+                    int index = 0;
+
+                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    await Task.Delay(1000, stoppingToken);
+
+                    if (NextTimeToExecute <= DateTime.Now)
                     {
-                        int index = 0;
+                        NextTimeToExecute = DateTime.MinValue;
+                    }
 
-                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                        await Task.Delay(1000, stoppingToken);
+                    if (NextTimeToExecute == DateTime.MinValue)
+                    {
+                        NextTimeToExecute = DateTime.Now.AddHours(2);
+                        //NextTimeToExecute = DateTime.Now.AddSeconds(20);
+                        var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
+                        licence = jsonData.lic;
+                        var param = new { lic = jsonData.lic };
+                        pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
+                    }
 
-                        if (NextTimeToExecute <= DateTime.Now)
+                    DriveInfo[] drives = DriveInfo.GetDrives();
+                    OnUpdateLog();
+                    GetAllFileFromFolder();
+                    CaptureLoggedInUser();
+                    foreach (dynamic path in pathfromApi.data.path)
+                    {
+                        var driveData = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
+                        var drive = GetDriveFromFilePath(driveData.ToString());
+                        // Check if the drive is ready and not a network drive
+                        if (driveData != "")
                         {
-                            NextTimeToExecute = DateTime.MinValue;
-                        }
-
-                        if (NextTimeToExecute == DateTime.MinValue)
-                        {
-                            NextTimeToExecute = DateTime.Now.AddHours(2);
-                            //NextTimeToExecute = DateTime.Now.AddSeconds(20);
-                            var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
-                            licence = jsonData.lic;
-                            var param = new { lic = jsonData.lic };
-                            pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
-                        }
-
-                        DriveInfo[] drives = DriveInfo.GetDrives();
-                        OnUpdateLog();
-                        GetAllFileFromFolder();
-                        CaptureLoggedInUser();
-                        foreach (dynamic path in pathfromApi.data.path)
-                        {
-                            var driveData = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
-                            var drive = GetDriveFromFilePath(driveData.ToString());
-                            // Check if the drive is ready and not a network drive
                             if (drive.IsReady && drive.DriveType != DriveType.Network)
                             {
 
@@ -136,38 +138,39 @@ namespace LegalDLPBeta
 
                                 }
                             }
-                            index++;
-
                         }
-
-                        DriveInfo[] drivesRemote = DriveInfo.GetDrives();
-                        foreach (DriveInfo drive in drivesRemote)
-                        {
-                            if (drive.IsReady && drive.DriveType == DriveType.Removable && !driverNameCol.Contains(drive.Name))
-                            {
-                                externaldrive = drive.Name;
-
-                                _watcher = new FileSystemWatcher(externaldrive.ToString());
-
-                                // Set the properties to monitor
-                                _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
-
-                                // Set the events to track
-                                _watcher.Created += OnCreatedExternal;
-                                _watcher.Changed += OnChangedExternal;
-                                _watcher.Deleted += OnDeletedExternal;
-                                _watcher.Renamed += OnRenamedExternal;
-
-                                // Start monitoring
-                                _watcher.EnableRaisingEvents = true;
-                            }
-                            driverNameCol.Add(drive.Name);
-                            await Task.Delay(1000, stoppingToken);
-                        }
+                        index++;
 
                     }
+
+                    DriveInfo[] drivesRemote = DriveInfo.GetDrives();
+                    foreach (DriveInfo drive in drivesRemote)
+                    {
+                        if (drive.IsReady && drive.DriveType == DriveType.Removable && !driverNameCol.Contains(drive.Name))
+                        {
+                            externaldrive = drive.Name;
+
+                            _watcher = new FileSystemWatcher(externaldrive.ToString());
+
+                            // Set the properties to monitor
+                            _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+
+                            // Set the events to track
+                            _watcher.Created += OnCreatedExternal;
+                            _watcher.Changed += OnChangedExternal;
+                            _watcher.Deleted += OnDeletedExternal;
+                            _watcher.Renamed += OnRenamedExternal;
+
+                            // Start monitoring
+                            _watcher.EnableRaisingEvents = true;
+                        }
+                        driverNameCol.Add(drive.Name);
+                        await Task.Delay(1000, stoppingToken);
+                    }
+
                 }
+                //}
             }
             catch (Exception ex)
             {
