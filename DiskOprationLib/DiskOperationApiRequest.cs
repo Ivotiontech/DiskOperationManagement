@@ -9,8 +9,8 @@ namespace DiskOprationLib
 {
     public static class DiskOperationApiRequest
     {
-        private static string BaseURL = "https://llg-api.dev.area51labs.it/api/v1/";
-        public static async Task<dynamic> GetDiskOperationApi(string EndPoint)
+        //private static string BaseURL = "https://llg-api.dev.area51labs.it/api/v1/";
+        public static async Task<dynamic> GetDiskOperationApi(string EndPoint, string BaseURL)
         {
             var httpClient = new HttpClient();
 
@@ -51,7 +51,7 @@ namespace DiskOprationLib
         }
 
 
-        public static async Task<dynamic> PostDiskOperationApi(dynamic parameter, string EndPoint)
+        public static async Task<dynamic> PostDiskOperationApi(dynamic parameter, string EndPoint,string BaseURL)
         {
             var httpClient = new HttpClient();
 

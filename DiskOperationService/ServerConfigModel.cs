@@ -11,4 +11,9 @@ namespace LegalDLPBeta
         public string serverIP { get; set; }
         public int serverPort { get; set; }
     }
+
+    public class ServerConfigURL
+    {
+        public string BaseURL { get; set; }
+    }
 }

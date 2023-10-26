@@ -44,6 +44,7 @@ namespace LegalDLPBeta
         private Timer _timer;
         static DateTime utcTime;
         private static IOptions<ServerConfigModel> config;
+        private static IOptions<ServerConfigURL> configUrl;
         string dateString = "23/09/2023 00:00:00";
         string format = "yyyy-MM-dd hh:mm:ss";
         DateTime parsedDate;
@@ -54,11 +55,12 @@ namespace LegalDLPBeta
         private static string licence = "";
         private static List<string> driverNameCol = new List<string>();
         private static List<string> driverNameDixedCol = new List<string>();
-        public Worker(ILogger<Worker> logger, IOptions<ServerConfigModel> _config)
+        public Worker(ILogger<Worker> logger, IOptions<ServerConfigModel> _config, IOptions<ServerConfigURL> _configUrl)
         {
             _logger = logger;
             dynamicsList = new List<dynamic>();
             config = _config;
+            configUrl = _configUrl;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -88,12 +90,12 @@ namespace LegalDLPBeta
 
                     if (NextTimeToExecute == DateTime.MinValue)
                     {
-                        NextTimeToExecute = DateTime.Now.AddHours(2);
+                        NextTimeToExecute = DateTime.Now.AddHours(1);
                         //NextTimeToExecute = DateTime.Now.AddSeconds(20);
                         var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
                         licence = jsonData.lic;
                         var param = new { lic = jsonData.lic };
-                        pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
+                        pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data", configUrl.Value.BaseURL);
                     }
 
                     DriveInfo[] drives = DriveInfo.GetDrives();
@@ -102,7 +104,7 @@ namespace LegalDLPBeta
                     CaptureLoggedInUser();
                     foreach (dynamic path in pathfromApi.data.path)
                     {
-                        var driveData = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JContainer)path).Last).Value;
+                        var driveData = ((JValue)((JContainer)path).Last).Value;
                         var drive = GetDriveFromFilePath(driveData.ToString());
                         // Check if the drive is ready and not a network drive
                         if (driveData != "")

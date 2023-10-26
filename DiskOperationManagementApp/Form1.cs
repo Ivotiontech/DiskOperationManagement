@@ -16,6 +16,7 @@ using DiskOprationLib;
 using Newtonsoft.Json;
 using System.ServiceProcess;
 using System.Threading;
+using System.Configuration;
 
 namespace DiskOperationManagementApp
 {
@@ -43,17 +44,19 @@ namespace DiskOperationManagementApp
 
             //var jsonData = ReadDataFromFile.ReadFileForSpeceficData(fileFullName);
             var param = new { lic = lic };
-            var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data");
+
+            string baseUrl = ConfigurationManager.AppSettings["BaseUrl"];
+
+            var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data", baseUrl);
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
             if (statusCode.ToString() == "200")
             {
                 var fileDirectory = fileinfo.Directory.FullName.Replace("LegalloggerApp", "LegalDLP-Beta") + "\\" + fileFullName;
                 string jsonString = JsonConvert.SerializeObject(param, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(fileDirectory, jsonString.ToString());
-                //EncryptFileCommand encryptFile = new EncryptFileCommand();
-                //encryptFile.EncryptFile(fileDirectory);
+                //Service Install
                 InstallWorkerService();
-                //this.Close();
+
             }
             else
             {
