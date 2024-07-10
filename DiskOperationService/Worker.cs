@@ -39,13 +39,13 @@ namespace LegalDLPBeta
         private static string fileFullName = @"LicenseKey.txt";
         private static string fileWorker = @"WorkerLog.txt";
         private static List<dynamic> dynamicsList;
-        private static List<dynamic> exceptionTCPJsonString;
-        private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP-Beta");
+        private static List<dynamic> exceptionTCPJsonString = new List<dynamic>();
+        private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP");
         private Timer _timer;
         static DateTime utcTime;
         private static IOptions<ServerConfigModel> config;
         private static IOptions<ServerConfigURL> configUrl;
-        string dateString = "23/09/2023 00:00:00";
+        string dateString = "11/08/2024 00:00:00";
         string format = "yyyy-MM-dd hh:mm:ss";
         DateTime parsedDate;
         IFormatProvider provider = new CultureInfo("fr-FR");
@@ -53,6 +53,9 @@ namespace LegalDLPBeta
         dynamic pathfromApi;
         private static string PCUserName = "";
         private static string licence = "";
+        private static string baseURL = "";
+        private static string Server = "";
+        private static string Port = "";
         private static List<string> driverNameCol = new List<string>();
         private static List<string> driverNameDixedCol = new List<string>();
         public Worker(ILogger<Worker> logger, IOptions<ServerConfigModel> _config, IOptions<ServerConfigURL> _configUrl)
@@ -69,110 +72,114 @@ namespace LegalDLPBeta
             {
                 Dispose();
                 GetUTCDateTime();
-                //if (utcTime >= Convert.ToDateTime("2023-09-25"))
-                //{
-                //    StopServiceCallback(null);
-                //}
-                //else
-                //{
-                // _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
-                while (!stoppingToken.IsCancellationRequested)
+                if (utcTime >= Convert.ToDateTime("2024-08-11"))
                 {
-                    int index = 0;
-
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                    await Task.Delay(1000, stoppingToken);
-
-                    if (NextTimeToExecute <= DateTime.Now)
+                    StopServiceCallback(null);
+                }
+                else
+                {
+                    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
+                    while (!stoppingToken.IsCancellationRequested)
                     {
-                        NextTimeToExecute = DateTime.MinValue;
-                    }
+                        int index = 0;
 
-                    if (NextTimeToExecute == DateTime.MinValue)
-                    {
-                        NextTimeToExecute = DateTime.Now.AddHours(1);
-                        //NextTimeToExecute = DateTime.Now.AddSeconds(20);
-                        var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
-                        licence = jsonData.lic;
-                        var param = new { lic = jsonData.lic };
-                        pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data", configUrl.Value.BaseURL);
-                    }
+                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                        await Task.Delay(1000, stoppingToken);
 
-                    DriveInfo[] drives = DriveInfo.GetDrives();
-                    OnUpdateLog();
-                    GetAllFileFromFolder();
-                    CaptureLoggedInUser();
-                    foreach (dynamic path in pathfromApi.data.path)
-                    {
-                        var driveData = ((JValue)((JContainer)path).Last).Value;
-                        var drive = GetDriveFromFilePath(driveData.ToString());
-                        // Check if the drive is ready and not a network drive
-                        if (driveData != "")
+                        if (NextTimeToExecute <= DateTime.Now)
                         {
-                            if (drive.IsReady && drive.DriveType != DriveType.Network)
+                            NextTimeToExecute = DateTime.MinValue;
+                        }
+
+                        if (NextTimeToExecute == DateTime.MinValue)
+                        {
+                            NextTimeToExecute = DateTime.Now.AddHours(1);
+                            //NextTimeToExecute = DateTime.Now.AddSeconds(20);
+                            var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
+                            licence = jsonData.lic;
+                            baseURL = jsonData.baseURL;
+                            var param = new { lic = jsonData.lic };
+                            pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "dlp/get-license-data", baseURL);
+                            Server = ((JValue)((JProperty)((JContainer)pathfromApi.data).First.Next.Next).Value).Value.ToString();
+                            Port = ((JValue)((JProperty)((JContainer)pathfromApi.data).First.Next.Next.Next).Value).Value.ToString();
+
+                        }
+
+                        DriveInfo[] drives = DriveInfo.GetDrives();
+                        OnUpdateLog();
+                        GetAllFileFromFolder();
+                        CaptureLoggedInUser();
+                        foreach (dynamic path in pathfromApi.data.path)
+                        {
+                            var driveData = ((JValue)((JContainer)path).Last).Value;
+                            var drive = GetDriveFromFilePath(driveData.ToString());
+                            // Check if the drive is ready and not a network drive
+                            if (driveData != "")
                             {
-
-                                // Exclude external drives (DriveType.Removable)
-                                if (drive.DriveType != DriveType.Removable && !driverNameDixedCol.Contains(driveData.ToString()))
+                                if (drive.IsReady && drive.DriveType != DriveType.Network)
                                 {
-                                    // Perform your desired actions with the non-external drive
-                                    //Console.WriteLine("Drive: " + drive.Name);
-                                    string systemDrive = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3);
-                                    //if (drive.Name == systemDrive) continue;
+
+                                    // Exclude external drives (DriveType.Removable)
+                                    if (drive.DriveType != DriveType.Removable && !driverNameDixedCol.Contains(driveData.ToString()))
+                                    {
+                                        // Perform your desired actions with the non-external drive
+                                        //Console.WriteLine("Drive: " + drive.Name);
+                                        string systemDrive = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 3);
+                                        //if (drive.Name == systemDrive) continue;
 
 
-                                    // Create a new FileSystemWatcher instance
-                                    _watcher = new FileSystemWatcher(driveData.ToString());
+                                        // Create a new FileSystemWatcher instance
+                                        _watcher = new FileSystemWatcher(driveData.ToString());
 
-                                    // Set the properties to monitor
-                                    _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                                    _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+                                        // Set the properties to monitor
+                                        _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                                        _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
-                                    // Set the events to track
-                                    _watcher.Created += OnCreated;
-                                    _watcher.Changed += OnChanged;
-                                    _watcher.Deleted += OnDeleted;
-                                    _watcher.Renamed += OnRenamed;
+                                        // Set the events to track
+                                        _watcher.Created += OnCreated;
+                                        _watcher.Changed += OnChanged;
+                                        _watcher.Deleted += OnDeleted;
+                                        _watcher.Renamed += OnRenamed;
 
-                                    // Start monitoring
-                                    _watcher.EnableRaisingEvents = true;
-                                    driverNameDixedCol.Add(driveData.ToString());
+                                        // Start monitoring
+                                        _watcher.EnableRaisingEvents = true;
+                                        driverNameDixedCol.Add(driveData.ToString());
 
+                                    }
                                 }
                             }
+                            index++;
+
                         }
-                        index++;
 
-                    }
-
-                    DriveInfo[] drivesRemote = DriveInfo.GetDrives();
-                    foreach (DriveInfo drive in drivesRemote)
-                    {
-                        if (drive.IsReady && drive.DriveType == DriveType.Removable && !driverNameCol.Contains(drive.Name))
+                        DriveInfo[] drivesRemote = DriveInfo.GetDrives();
+                        foreach (DriveInfo drive in drivesRemote)
                         {
-                            externaldrive = drive.Name;
+                            if (drive.IsReady && drive.DriveType == DriveType.Removable && !driverNameCol.Contains(drive.Name))
+                            {
+                                externaldrive = drive.Name;
 
-                            _watcher = new FileSystemWatcher(externaldrive.ToString());
+                                _watcher = new FileSystemWatcher(externaldrive.ToString());
 
-                            // Set the properties to monitor
-                            _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
-                            _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
+                                // Set the properties to monitor
+                                _watcher.IncludeSubdirectories = true; // Monitor subdirectories as well
+                                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
 
-                            // Set the events to track
-                            _watcher.Created += OnCreatedExternal;
-                            _watcher.Changed += OnChangedExternal;
-                            _watcher.Deleted += OnDeletedExternal;
-                            _watcher.Renamed += OnRenamedExternal;
+                                // Set the events to track
+                                _watcher.Created += OnCreatedExternal;
+                                _watcher.Changed += OnChangedExternal;
+                                _watcher.Deleted += OnDeletedExternal;
+                                _watcher.Renamed += OnRenamedExternal;
 
-                            // Start monitoring
-                            _watcher.EnableRaisingEvents = true;
+                                // Start monitoring
+                                _watcher.EnableRaisingEvents = true;
+                            }
+                            driverNameCol.Add(drive.Name);
+                            await Task.Delay(1000, stoppingToken);
                         }
-                        driverNameCol.Add(drive.Name);
-                        await Task.Delay(1000, stoppingToken);
-                    }
 
+                    }
                 }
-                //}
             }
             catch (Exception ex)
             {
@@ -269,7 +276,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -294,7 +302,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -319,7 +328,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -344,7 +354,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -365,7 +376,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -405,8 +417,8 @@ namespace LegalDLPBeta
 
         private static void TCPFileUpload(string filePath, string type)
         {
-            string serverIP = config.Value.serverIP;
-            int serverPort = config.Value.serverPort;
+            string serverIP = Server;
+            int serverPort = Convert.ToInt32(Port);
             var path = servicePath + "\\" + fileWorker;
             try
             {
@@ -432,6 +444,10 @@ namespace LegalDLPBeta
                         var successData = $"{Environment.NewLine} User Name: {PCUserName} Drive Type: {type} File sent successfully on this {DateTime.Now}";
                         File.AppendAllText(path, successData + Environment.NewLine);
                         Console.WriteLine($"Drive Type: {type} -- File sent successfully.");
+                        if (exceptionTCPJsonString.Count != 0)
+                        {
+                            exceptionTCPJsonString.Clear();
+                        }
                     }
                 }
             }
@@ -440,7 +456,11 @@ namespace LegalDLPBeta
                 if (!ex.Message.Contains(path))
                 {
                     var jsonObject = JsonConvert.DeserializeObject<dynamic>(filePath);
-                    exceptionTCPJsonString.Add(jsonObject);
+                    var json = exceptionTCPJsonString.Where(p => p.Contains(jsonObject));
+                    if (!json.Any())
+                        exceptionTCPJsonString.Add(jsonObject);
+                    Console.WriteLine($"Drive Type: {type} -- Object add successfully.");
+
                 }
             }
         }
@@ -467,10 +487,10 @@ namespace LegalDLPBeta
             try
             {
                 string jsonString = JsonConvert.SerializeObject(exceptionTCPJsonString, Newtonsoft.Json.Formatting.Indented);
-                if (exceptionTCPJsonString != null)
+                if (exceptionTCPJsonString.Count != 0)
                 {
                     TCPFileUpload(jsonString, "Mixed");
-                    exceptionTCPJsonString.Clear();
+
                 }
             }
             catch (Exception ex)
@@ -487,7 +507,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -512,7 +533,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -537,7 +559,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -562,7 +585,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -583,7 +607,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);

@@ -1,0 +1,10 @@
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\bin\Debug\netstandard2.0\DiskOprationLib.deps.json
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\bin\Debug\netstandard2.0\DiskOprationLib.dll
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\bin\Debug\netstandard2.0\DiskOprationLib.pdb
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.csproj.AssemblyReference.cache
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.GeneratedMSBuildEditorConfig.editorconfig
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.AssemblyInfoInputs.cache
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.AssemblyInfo.cs
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.csproj.CoreCompileInputs.cache
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.dll
+C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\obj\Debug\netstandard2.0\DiskOprationLib.pdb
