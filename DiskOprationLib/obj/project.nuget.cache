@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "G3xLJZA8g6zSyC0PskUKZ4CSo4bNiL+vPGkDSP8a4atvG6upvjayR19T/M5NgUO7Nq/I5IY1Fm3TOLU7N2kajQ==",
+  "success": true,
+  "projectFilePath": "C:\\Aditya\\DiskOperationManagement\\DiskOperationManagement\\DiskOprationLib\\DiskOprationLib.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

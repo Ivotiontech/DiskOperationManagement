@@ -1,0 +1,4 @@
+{
+  "lic": "LKJHG-FDSAZ-XCVBN-QWERT",
+  "baseUrl": "https://llg-api.dev.area51labs.it/api/v1/"
+}

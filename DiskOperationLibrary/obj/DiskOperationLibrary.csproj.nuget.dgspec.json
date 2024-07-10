@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj": {}
+    "C:\\Aditya\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj": {}
   },
   "projects": {
-    "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj": {
+    "C:\\Aditya\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
+        "projectUniqueName": "C:\\Aditya\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
         "projectName": "DiskOperationLibrary",
-        "projectPath": "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "F:\\Aditya\\Disk_Operations_Monitoring\\DiskOperationManagement\\DiskOperationLibrary\\obj\\",
+        "projectPath": "C:\\Aditya\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\DiskOperationLibrary.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "C:\\Aditya\\DiskOperationManagement\\DiskOperationManagement\\DiskOperationLibrary\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -65,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }

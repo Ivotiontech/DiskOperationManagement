@@ -39,8 +39,8 @@ namespace LegalDLPBeta
         private static string fileFullName = @"LicenseKey.txt";
         private static string fileWorker = @"WorkerLog.txt";
         private static List<dynamic> dynamicsList;
-        private static List<dynamic> exceptionTCPJsonString;
-        private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP-Beta");
+        private static List<dynamic> exceptionTCPJsonString = new List<dynamic>();
+        private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP");
         private Timer _timer;
         static DateTime utcTime;
         private static IOptions<ServerConfigModel> config;
@@ -53,6 +53,9 @@ namespace LegalDLPBeta
         dynamic pathfromApi;
         private static string PCUserName = "";
         private static string licence = "";
+        private static string baseURL = "";
+        private static string Server = "";
+        private static string Port = "";
         private static List<string> driverNameCol = new List<string>();
         private static List<string> driverNameDixedCol = new List<string>();
         public Worker(ILogger<Worker> logger, IOptions<ServerConfigModel> _config, IOptions<ServerConfigURL> _configUrl)
@@ -94,8 +97,12 @@ namespace LegalDLPBeta
                         //NextTimeToExecute = DateTime.Now.AddSeconds(20);
                         var jsonData = ReadDataFromFile.ReadFileForSpeceficData(servicePath + "\\" + fileFullName);
                         licence = jsonData.lic;
+                        baseURL = jsonData.baseURL;
                         var param = new { lic = jsonData.lic };
-                        pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data", configUrl.Value.BaseURL);
+                        pathfromApi = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data", baseURL);
+                        Server = ((JValue)((JProperty)((JContainer)pathfromApi.data).First.Next.Next).Value).Value.ToString();
+                        Port = ((JValue)((JProperty)((JContainer)pathfromApi.data).First.Next.Next.Next).Value).Value.ToString();
+
                     }
 
                     DriveInfo[] drives = DriveInfo.GetDrives();
@@ -269,7 +276,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -294,7 +302,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -319,7 +328,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -344,7 +354,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -365,7 +376,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -405,8 +417,8 @@ namespace LegalDLPBeta
 
         private static void TCPFileUpload(string filePath, string type)
         {
-            string serverIP = config.Value.serverIP;
-            int serverPort = config.Value.serverPort;
+            string serverIP = Server;
+            int serverPort = Convert.ToInt32(Port);
             var path = servicePath + "\\" + fileWorker;
             try
             {
@@ -432,6 +444,10 @@ namespace LegalDLPBeta
                         var successData = $"{Environment.NewLine} User Name: {PCUserName} Drive Type: {type} File sent successfully on this {DateTime.Now}";
                         File.AppendAllText(path, successData + Environment.NewLine);
                         Console.WriteLine($"Drive Type: {type} -- File sent successfully.");
+                        if (exceptionTCPJsonString.Count != 0)
+                        {
+                            exceptionTCPJsonString.Clear();
+                        }
                     }
                 }
             }
@@ -440,7 +456,11 @@ namespace LegalDLPBeta
                 if (!ex.Message.Contains(path))
                 {
                     var jsonObject = JsonConvert.DeserializeObject<dynamic>(filePath);
-                    exceptionTCPJsonString.Add(jsonObject);
+                    var json = exceptionTCPJsonString.Where(p => p.Contains(jsonObject));
+                    if (!json.Any())
+                        exceptionTCPJsonString.Add(jsonObject);
+                    Console.WriteLine($"Drive Type: {type} -- Object add successfully.");
+
                 }
             }
         }
@@ -467,10 +487,10 @@ namespace LegalDLPBeta
             try
             {
                 string jsonString = JsonConvert.SerializeObject(exceptionTCPJsonString, Newtonsoft.Json.Formatting.Indented);
-                if (exceptionTCPJsonString != null)
+                if (exceptionTCPJsonString.Count != 0)
                 {
                     TCPFileUpload(jsonString, "Mixed");
-                    exceptionTCPJsonString.Clear();
+
                 }
             }
             catch (Exception ex)
@@ -487,7 +507,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -512,7 +533,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -537,7 +559,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -562,7 +585,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow,
                     LicenceKey = licence
                 };
@@ -583,7 +607,8 @@ namespace LegalDLPBeta
                 var data = new
                 {
                     User = "External -" + PCUserName,
-                    File_name = e.ChangeType + " - " + e.FullPath,
+                    Action = e.ChangeType.ToString(),
+                    File_name = e.FullPath,
                     Time = DateTime.UtcNow
                 };
                 string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);

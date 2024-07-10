@@ -8,4 +8,4 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = DiskOperationLibrary
-build_property.ProjectDir = F:\Aditya\Disk_Operations_Monitoring\DiskOperationManagement\DiskOperationLibrary\
+build_property.ProjectDir = C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOperationLibrary\

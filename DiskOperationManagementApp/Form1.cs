@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.Security.Cryptography;
-using System.Reflection.Emit;
 using System.IO;
-using DiskOprationLib;
 using Newtonsoft.Json;
-using System.ServiceProcess;
 using System.Threading;
 using System.Configuration;
+using DiskOprationLib;
 
 namespace DiskOperationManagementApp
 {
@@ -26,7 +18,7 @@ namespace DiskOperationManagementApp
         readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
         private ServiceController serviceController;
-        string serviceName = "LegalDLP-Beta";
+        string serviceName = "LegalDLP";
 
         private readonly string fileFullName = @"LicenseKey.txt";
         public Form1()
@@ -42,17 +34,19 @@ namespace DiskOperationManagementApp
             var fileinfo = new FileInfo(fileFullName);
             var lic = txtAccessKey.Text;
 
+
             //var jsonData = ReadDataFromFile.ReadFileForSpeceficData(fileFullName);
             var param = new { lic = lic };
 
-            string baseUrl = ConfigurationManager.AppSettings["BaseUrl"];
+            string baseUrl = txtAccessURL.Text; //ConfigurationManager.AppSettings["BaseUrl"];
 
             var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "get-license-data", baseUrl);
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;
             if (statusCode.ToString() == "200")
             {
-                var fileDirectory = fileinfo.Directory.FullName.Replace("LegalloggerApp", "LegalDLP-Beta") + "\\" + fileFullName;
-                string jsonString = JsonConvert.SerializeObject(param, Newtonsoft.Json.Formatting.Indented);
+                var paramData = new { lic = lic, baseURL = baseUrl };
+                var fileDirectory = fileinfo.Directory.FullName.Replace("LegalloggerApp", "LegalDLP") + "\\" + fileFullName;
+                string jsonString = JsonConvert.SerializeObject(paramData, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(fileDirectory, jsonString.ToString());
                 //Service Install
                 InstallWorkerService();
@@ -66,7 +60,7 @@ namespace DiskOperationManagementApp
 
         private void InstallWorkerService()
         {
-            string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP-Beta\\LegalDLP-Beta.exe");
+            string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP\\LegalDLP.exe");
 
             try
             {
