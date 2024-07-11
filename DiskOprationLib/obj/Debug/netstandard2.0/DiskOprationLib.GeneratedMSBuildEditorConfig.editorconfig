@@ -1,3 +1,5 @@
 is_global = true
 build_property.RootNamespace = DiskOprationLib
-build_property.ProjectDir = C:\Aditya\DiskOperationManagement\DiskOperationManagement\DiskOprationLib\
+build_property.ProjectDir = F:\Aditya\DiskOperationManagement(DOM)\DiskOperationManagement\DiskOprationLib\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "LegalDLP-Beta/1.0.0": {
+      "LegalDLP/1.0.0": {
         "dependencies": {
           "DiskOprationLib": "1.0.0",
           "Microsoft.AspNetCore.Hosting": "2.2.7",
@@ -19,7 +19,7 @@
           "System.Management": "7.0.2"
         },
         "runtime": {
-          "LegalDLP-Beta.dll": {}
+          "LegalDLP.dll": {}
         }
       },
       "Microsoft.AspNetCore.Hosting/2.2.7": {
@@ -651,7 +651,7 @@
     }
   },
   "libraries": {
-    "LegalDLP-Beta/1.0.0": {
+    "LegalDLP/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

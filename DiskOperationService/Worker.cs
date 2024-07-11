@@ -27,6 +27,8 @@ using System.Numerics;
 using System.Reflection.Metadata;
 using System.Security.Principal;
 using System.ComponentModel;
+using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging;
 
 namespace LegalDLPBeta
 {
@@ -38,11 +40,13 @@ namespace LegalDLPBeta
         private readonly ILogger<Worker> _logger;
         private static string fileFullName = @"LicenseKey.txt";
         private static string fileWorker = @"WorkerLog.txt";
+        private static string serviceWorker = @"ServiceWorkerLog.txt";
         private static List<dynamic> dynamicsList;
         private static List<dynamic> exceptionTCPJsonString = new List<dynamic>();
         private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP");
         private Timer _timer;
         static DateTime utcTime;
+        static int utc;
         private static IOptions<ServerConfigModel> config;
         private static IOptions<ServerConfigURL> configUrl;
         string dateString = "11/08/2024 00:00:00";
@@ -71,14 +75,14 @@ namespace LegalDLPBeta
             try
             {
                 Dispose();
-                GetUTCDateTime();
-                if (utcTime >= Convert.ToDateTime("2024-08-11"))
+                GetTimeResponse();//GetTimeResponse();
+                if (utc != 1)
                 {
                     StopServiceCallback(null);
                 }
                 else
                 {
-                    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(10), TimeSpan.FromMilliseconds(-1));
+                    _timer = new Timer(StopServiceCallback, null, TimeSpan.FromDays(30), TimeSpan.FromMilliseconds(-1));
                     while (!stoppingToken.IsCancellationRequested)
                     {
                         int index = 0;
@@ -140,7 +144,8 @@ namespace LegalDLPBeta
                                         _watcher.Changed += OnChanged;
                                         _watcher.Deleted += OnDeleted;
                                         _watcher.Renamed += OnRenamed;
-
+                                        var str = $"Serive has Started {driveData.ToString()} at: {DateTimeOffset.Now} ";
+                                        CreateLoggerForService(str);
                                         // Start monitoring
                                         _watcher.EnableRaisingEvents = true;
                                         driverNameDixedCol.Add(driveData.ToString());
@@ -173,6 +178,8 @@ namespace LegalDLPBeta
 
                                 // Start monitoring
                                 _watcher.EnableRaisingEvents = true;
+                                var str = $"Serive has Started {externaldrive.ToString()} at: {DateTimeOffset.Now}";
+                                CreateLoggerForService(str);
                             }
                             driverNameCol.Add(drive.Name);
                             await Task.Delay(1000, stoppingToken);
@@ -214,6 +221,26 @@ namespace LegalDLPBeta
             }
         }
 
+        public void GetTimeResponse()
+        {
+            string apiUrl = "https://api.apectechs.com/api/Dashboard/TimeReturn";
+            try
+            {
+                var httpClient = new HttpClient();
+                // The endpoint you want to request
+                HttpResponseMessage response = httpClient.GetAsync($"{apiUrl}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    // Read the response content as a string
+                    utc = 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
         static DriveInfo GetDriveFromFilePath(string filePath)
         {
             // Get the root directory (drive) of the file path
@@ -240,18 +267,24 @@ namespace LegalDLPBeta
         {
             _logger.LogInformation("Stopping worker service at: {time}", DateTimeOffset.Now);
             _timer?.Dispose();
+            var str = $"Stopping worker service at: {DateTimeOffset.Now}";
+            CreateLoggerForService(str);
             StopAsync(CancellationToken.None).Wait();
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Service running at: {time}", DateTimeOffset.Now);
+            var str = $"Service running at {DateTimeOffset.Now} ";
+            CreateLoggerForService(str);
             return base.StartAsync(cancellationToken);
         }
         public override Task StopAsync(CancellationToken cancellationToken)
         {
 
             _logger.LogInformation("Service stopped at: {time}", DateTimeOffset.Now);
+            var str = $"Service stopped at: {DateTimeOffset.Now}";
+            CreateLoggerForService(str);
             return base.StopAsync(cancellationToken);
         }
 
@@ -273,6 +306,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Created)
             {
+                var str = $"OnCreated function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = PCUserName,
@@ -299,6 +334,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Changed)
             {
+                var str = $"OnChanged function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = PCUserName,
@@ -325,6 +362,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Deleted)
             {
+                var str = $"OnDeleted function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = PCUserName,
@@ -351,6 +390,8 @@ namespace LegalDLPBeta
 
             if (e.OldFullPath.EndsWith("\\"))
             {
+                var str = $"OnRenamed function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = PCUserName,
@@ -398,6 +439,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Created)
             {
+                var str = $"external drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 string myfile = @"C:/log.txt";
 
                 if (Path.GetPathRoot(e.FullPath) == Path.GetPathRoot(externaldrive))
@@ -443,6 +486,7 @@ namespace LegalDLPBeta
                         }
                         var successData = $"{Environment.NewLine} User Name: {PCUserName} Drive Type: {type} File sent successfully on this {DateTime.Now}";
                         File.AppendAllText(path, successData + Environment.NewLine);
+                        CreateLoggerForService(successData);
                         Console.WriteLine($"Drive Type: {type} -- File sent successfully.");
                         if (exceptionTCPJsonString.Count != 0)
                         {
@@ -456,9 +500,12 @@ namespace LegalDLPBeta
                 if (!ex.Message.Contains(path))
                 {
                     var jsonObject = JsonConvert.DeserializeObject<dynamic>(filePath);
+                    CreateLoggerForService(ex.Message);
+                    Console.WriteLine($"Drive Type: {type} -- Data added successfully.");
                     var json = exceptionTCPJsonString.Where(p => p.Contains(jsonObject));
                     if (!json.Any())
                         exceptionTCPJsonString.Add(jsonObject);
+
                     Console.WriteLine($"Drive Type: {type} -- Object add successfully.");
 
                 }
@@ -470,6 +517,8 @@ namespace LegalDLPBeta
             // Appending the given texts
             try
             {
+                var str = $"OnUpdateLog external drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 if (dynamicsList.Count != 0)
                 {
                     TCPFileUpload(jsonString, "mixed");
@@ -504,6 +553,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Created)
             {
+                var str = $"OnCreatedExternal drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = "External -" + PCUserName,
@@ -530,6 +581,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Changed)
             {
+                var str = $"OnChangedExternal drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = "External -" + PCUserName,
@@ -556,6 +609,8 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Deleted)
             {
+                var str = $"OnDeletedExternal drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = "External -" + PCUserName,
@@ -582,6 +637,8 @@ namespace LegalDLPBeta
 
             if (e.OldFullPath.EndsWith("\\"))
             {
+                var str = $"OnRenamedExternal drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = "External -" + PCUserName,
@@ -604,6 +661,8 @@ namespace LegalDLPBeta
             }
             else
             {
+                var str = $"OnRenamedExternal drive function at: {DateTimeOffset.Now}";
+                CreateLoggerForService(str);
                 var data = new
                 {
                     User = "External -" + PCUserName,
@@ -644,6 +703,30 @@ namespace LegalDLPBeta
                         Console.WriteLine("Currently logged-in user WIN: " + PCUserName);
                     }
                 }
+            }
+        }
+
+        private static void CreateLoggerForService(string Logger)
+        {
+            try
+            {
+                var path = servicePath + "\\" + serviceWorker;
+                if (!File.Exists(path))
+                {
+                    File.Create(path);
+                }
+                File.AppendAllText(path, Logger + Environment.NewLine);
+                Console.WriteLine($"Log data added successfully.");
+            }
+            catch (Exception ex)
+            {
+                var path = servicePath + "\\" + serviceWorker;
+                if (!File.Exists(path))
+                {
+                    File.Create(path);
+                }
+                File.AppendAllText(path, ex.Message + Environment.NewLine);
+                Console.WriteLine($"Error Message --> Data added successfully.");
             }
         }
     }

@@ -1,0 +1,4 @@
+{
+  "lic": "ZXCVB-NMLKJ-HGFDS-AQWER",
+  "baseURL": "https://adm.legallogger.com/api/v2/"
+}

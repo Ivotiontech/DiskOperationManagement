@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LegalDLP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4986791f5f3a05f2236ce70f61a3ce6b469562a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b7312637a51e79562d5a342dbfbe894075ffd2fa")]
 [assembly: System.Reflection.AssemblyProductAttribute("LegalDLP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LegalDLP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
