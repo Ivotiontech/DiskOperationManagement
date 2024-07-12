@@ -33,12 +33,11 @@ namespace DiskOperationManagementApp
             btnAccess.Enabled = false;
             var fileinfo = new FileInfo(fileFullName);
             var lic = txtAccessKey.Text;
-
+            //txtAccessURL.Text = ConfigurationManager.AppSettings["BaseUrl"];
+            string baseUrl = ConfigurationManager.AppSettings["BaseUrl"];
 
             //var jsonData = ReadDataFromFile.ReadFileForSpeceficData(fileFullName);
             var param = new { lic = lic };
-
-            string baseUrl = txtAccessURL.Text; //ConfigurationManager.AppSettings["BaseUrl"];
 
             var dt = await DiskOperationApiRequest.PostDiskOperationApi(param, "dlp/get-license-data", baseUrl);
             var statusCode = ((Newtonsoft.Json.Linq.JValue)((Newtonsoft.Json.Linq.JProperty)((Newtonsoft.Json.Linq.JContainer)dt).First.Next).Value).Value;

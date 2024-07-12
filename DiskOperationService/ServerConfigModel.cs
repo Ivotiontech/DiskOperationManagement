@@ -8,6 +8,7 @@ namespace LegalDLPBeta
 {
     public class ServerConfigModel
     {
+        public bool debug_service { get; set; }
         public string serverIP { get; set; }
         public int serverPort { get; set; }
     }

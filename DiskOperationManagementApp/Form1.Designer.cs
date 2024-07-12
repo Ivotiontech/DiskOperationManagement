@@ -42,6 +42,7 @@
             this.txtAccessURL.Name = "txtAccessURL";
             this.txtAccessURL.Size = new System.Drawing.Size(209, 20);
             this.txtAccessURL.TabIndex = 2;
+            this.txtAccessURL.Visible = false;
             // 
             // btnAccess
             // 
@@ -51,7 +52,7 @@
             this.btnAccess.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAccess.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAccess.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnAccess.Location = new System.Drawing.Point(481, 18);
+            this.btnAccess.Location = new System.Drawing.Point(253, 18);
             this.btnAccess.Name = "btnAccess";
             this.btnAccess.Size = new System.Drawing.Size(125, 35);
             this.btnAccess.TabIndex = 3;
@@ -61,7 +62,7 @@
             // 
             // txtAccessKey
             // 
-            this.txtAccessKey.Location = new System.Drawing.Point(248, 27);
+            this.txtAccessKey.Location = new System.Drawing.Point(12, 27);
             this.txtAccessKey.Name = "txtAccessKey";
             this.txtAccessKey.Size = new System.Drawing.Size(209, 20);
             this.txtAccessKey.TabIndex = 4;
@@ -75,12 +76,13 @@
             this.lblAccessURL.Size = new System.Drawing.Size(77, 13);
             this.lblAccessURL.TabIndex = 5;
             this.lblAccessURL.Text = "Access URL";
+            this.lblAccessURL.Visible = false;
             // 
             // lblAccessKey
             // 
             this.lblAccessKey.AutoSize = true;
             this.lblAccessKey.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAccessKey.Location = new System.Drawing.Point(245, 8);
+            this.lblAccessKey.Location = new System.Drawing.Point(12, 8);
             this.lblAccessKey.Name = "lblAccessKey";
             this.lblAccessKey.Size = new System.Drawing.Size(73, 13);
             this.lblAccessKey.TabIndex = 6;
@@ -90,7 +92,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(633, 66);
+            this.ClientSize = new System.Drawing.Size(388, 66);
             this.Controls.Add(this.lblAccessKey);
             this.Controls.Add(this.lblAccessURL);
             this.Controls.Add(this.txtAccessKey);

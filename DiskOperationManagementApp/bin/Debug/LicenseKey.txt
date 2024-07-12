@@ -1,4 +1,4 @@
 {
-  "lic": "LKJHG-FDSAZ-XCVBN-QWERT",
-  "baseUrl": "https://llg-api.dev.area51labs.it/api/v1/"
+  "lic": "ZXCVB-NMLKJ-HGFDS-AQWER",
+  "baseURL": "https://adm.legallogger.com/api/v2/"
 }

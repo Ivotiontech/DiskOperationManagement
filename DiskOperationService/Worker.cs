@@ -41,6 +41,8 @@ namespace LegalDLPBeta
         private static string fileFullName = @"LicenseKey.txt";
         private static string fileWorker = @"WorkerLog.txt";
         private static string serviceWorker = @"ServiceWorkerLog.txt";
+        private static string ignoreProgram = @"Program Files";
+        private static string ignoreProgram86 = @"Program Files (x86)";
         private static List<dynamic> dynamicsList;
         private static List<dynamic> exceptionTCPJsonString = new List<dynamic>();
         private static string servicePath = Directory.GetCurrentDirectory().Replace("LegalloggerApp", "LegalDLP");
@@ -116,10 +118,10 @@ namespace LegalDLPBeta
                         foreach (dynamic path in pathfromApi.data.path)
                         {
                             var driveData = ((JValue)((JContainer)path).Last).Value;
-                            var drive = GetDriveFromFilePath(driveData.ToString());
-                            // Check if the drive is ready and not a network drive
-                            if (driveData != "")
+                            if (driveData != null)
                             {
+                                var drive = GetDriveFromFilePath(driveData.ToString());
+                                // Check if the drive is ready and not a network drive
                                 if (drive.IsReady && drive.DriveType != DriveType.Network)
                                 {
 
@@ -190,6 +192,8 @@ namespace LegalDLPBeta
             }
             catch (Exception ex)
             {
+                var str = $"Error: {ex.Message}";
+                CreateLoggerForService(str);
                 Console.WriteLine($"Error: {ex.Message}");
                 //throw ex;
             }
@@ -306,26 +310,29 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Created)
             {
-                var str = $"OnCreated function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnCreated function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "Fixed");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "Fixed");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
 
@@ -334,26 +341,29 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Changed)
             {
-                var str = $"OnChanged function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnChanged function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "Fixed");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "Fixed");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
 
@@ -362,26 +372,29 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Deleted)
             {
-                var str = $"OnDeleted function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnDeleted function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "Fixed");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "Fixed");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
         }
@@ -390,48 +403,54 @@ namespace LegalDLPBeta
 
             if (e.OldFullPath.EndsWith("\\"))
             {
-                var str = $"OnRenamed function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnRenamed function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "Fixed");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "Fixed");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
             else
             {
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var data = new
+                    {
+                        User = PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "Fixed");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "Fixed");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
         }
@@ -439,21 +458,24 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Created)
             {
-                var str = $"external drive function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                string myfile = @"C:/log.txt";
-
-                if (Path.GetPathRoot(e.FullPath) == Path.GetPathRoot(externaldrive))
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine($"File {e.Name} was copied to the external drive.");
-                    using (StreamWriter sw = File.AppendText(myfile))
-                    {
-                        sw.WriteLine($"File {e.Name} was copied to the external drive.");
-                    }
-                }
+                    var str = $"external drive function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    string myfile = @"C:/log.txt";
 
-                // Appending the given texts
-                //Console.WriteLine($"Folder/File created: {e.FullPath}");
+                    if (Path.GetPathRoot(e.FullPath) == Path.GetPathRoot(externaldrive))
+                    {
+                        Console.WriteLine($"File {e.Name} was copied to the external drive.");
+                        using (StreamWriter sw = File.AppendText(myfile))
+                        {
+                            sw.WriteLine($"File {e.Name} was copied to the external drive.");
+                        }
+                    }
+
+                    // Appending the given texts
+                    //Console.WriteLine($"Folder/File created: {e.FullPath}");
+                }
             }
 
         }
@@ -553,26 +575,29 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Created)
             {
-                var str = $"OnCreatedExternal drive function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = "External -" + PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnCreatedExternal drive function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = "External -" + PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "External");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "External");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
 
@@ -581,26 +606,29 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Changed)
             {
-                var str = $"OnChangedExternal drive function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = "External -" + PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnChangedExternal drive function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = "External -" + PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "External");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "External");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
 
@@ -609,26 +637,29 @@ namespace LegalDLPBeta
         {
             if (e.ChangeType == WatcherChangeTypes.Deleted)
             {
-                var str = $"OnDeletedExternal drive function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = "External -" + PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnDeletedExternal drive function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = "External -" + PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "External");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "External");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
         }
@@ -637,49 +668,55 @@ namespace LegalDLPBeta
 
             if (e.OldFullPath.EndsWith("\\"))
             {
-                var str = $"OnRenamedExternal drive function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = "External -" + PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow,
-                    LicenceKey = licence
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnRenamedExternal drive function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = "External -" + PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow,
+                        LicenceKey = licence
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "External");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "External");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
             else
             {
-                var str = $"OnRenamedExternal drive function at: {DateTimeOffset.Now}";
-                CreateLoggerForService(str);
-                var data = new
+                if (!e.FullPath.Contains(ignoreProgram, StringComparison.OrdinalIgnoreCase) && !e.FullPath.Contains(ignoreProgram86, StringComparison.OrdinalIgnoreCase))
                 {
-                    User = "External -" + PCUserName,
-                    Action = e.ChangeType.ToString(),
-                    File_name = e.FullPath,
-                    Time = DateTime.UtcNow
-                };
-                string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
+                    var str = $"OnRenamedExternal drive function at: {DateTimeOffset.Now}";
+                    CreateLoggerForService(str);
+                    var data = new
+                    {
+                        User = "External -" + PCUserName,
+                        Action = e.ChangeType.ToString(),
+                        File_name = e.FullPath,
+                        Time = DateTime.UtcNow
+                    };
+                    string jsonString = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
-                // Appending the given texts
-                try
-                {
-                    TCPFileUpload(jsonString, "External");
-                }
-                catch (Exception ex)
-                {
-                    dynamicsList.Add(data);
+                    // Appending the given texts
+                    try
+                    {
+                        TCPFileUpload(jsonString, "External");
+                    }
+                    catch (Exception ex)
+                    {
+                        dynamicsList.Add(data);
+                    }
                 }
             }
         }
@@ -687,46 +724,60 @@ namespace LegalDLPBeta
 
         public void CaptureLoggedInUser()
         {
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem"))
-            using (ManagementObjectCollection collection = searcher.Get())
+            try
             {
-                foreach (ManagementObject obj in collection)
+                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem"))
+                using (ManagementObjectCollection collection = searcher.Get())
                 {
-                    string username = obj["UserName"] as string;
-                    if (!string.IsNullOrEmpty(username))
+                    CreateLoggerForService($"User name coming from PC is the collection: {collection}");
+                    foreach (ManagementObject obj in collection)
                     {
-                        int index = username.LastIndexOf("\\");
-                        if (index >= 0)
+                        CreateLoggerForService($"User name coming from PC: {obj["UserName"] as string}");
+                        string username = obj["UserName"] as string;
+                        if (!string.IsNullOrEmpty(username))
                         {
-                            PCUserName = username.Substring(index + 1);
+                            int index = username.LastIndexOf("\\");
+                            if (index >= 0)
+                            {
+                                PCUserName = username.Substring(index + 1);
+                            }
+                            Console.WriteLine("Currently logged-in user WIN: " + PCUserName);
                         }
-                        Console.WriteLine("Currently logged-in user WIN: " + PCUserName);
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                CreateLoggerForService($"User name error: {ex.Message}");
+
+            }
+
         }
 
         private static void CreateLoggerForService(string Logger)
         {
-            try
+            if (config.Value.debug_service == true)
             {
-                var path = servicePath + "\\" + serviceWorker;
-                if (!File.Exists(path))
+                try
                 {
-                    File.Create(path);
+                    var path = servicePath + "\\" + serviceWorker;
+                    if (!File.Exists(path))
+                    {
+                        File.Create(path);
+                    }
+                    File.AppendAllText(path, Logger + Environment.NewLine);
+                    Console.WriteLine($"Log data added successfully.");
                 }
-                File.AppendAllText(path, Logger + Environment.NewLine);
-                Console.WriteLine($"Log data added successfully.");
-            }
-            catch (Exception ex)
-            {
-                var path = servicePath + "\\" + serviceWorker;
-                if (!File.Exists(path))
+                catch (Exception ex)
                 {
-                    File.Create(path);
+                    var path = servicePath + "\\" + serviceWorker;
+                    if (!File.Exists(path))
+                    {
+                        File.Create(path);
+                    }
+                    File.AppendAllText(path, ex.Message + Environment.NewLine);
+                    Console.WriteLine($"Error Message --> Data added successfully.");
                 }
-                File.AppendAllText(path, ex.Message + Environment.NewLine);
-                Console.WriteLine($"Error Message --> Data added successfully.");
             }
         }
     }

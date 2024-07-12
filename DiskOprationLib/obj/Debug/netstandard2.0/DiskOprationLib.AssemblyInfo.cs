@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DiskOprationLib")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b7312637a51e79562d5a342dbfbe894075ffd2fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+00114fe2f1e3396019b8fe85d3ce252092e597a2")]
 [assembly: System.Reflection.AssemblyProductAttribute("DiskOprationLib")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DiskOprationLib")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

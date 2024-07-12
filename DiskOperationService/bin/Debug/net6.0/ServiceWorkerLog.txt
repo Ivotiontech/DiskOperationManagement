@@ -37,3 +37,11 @@ A connection attempt failed because the connected party did not properly respond
 A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. 172.16.200.45:5141
 OnChanged function at: 7/11/2024 7:12:47 PM +05:30
 OnUpdateLog external drive function at: 7/11/2024 7:12:49 PM +05:30
+Service running at 7/12/2024 12:47:22 PM +05:30 
+OnUpdateLog external drive function at: 7/12/2024 12:47:53 PM +05:30
+User name coming from PC is the collection: System.Management.ManagementObjectCollection
+Service running at 7/12/2024 12:54:01 PM +05:30 
+OnUpdateLog external drive function at: 7/12/2024 12:54:08 PM +05:30
+User name coming from PC is the collection: System.Management.ManagementObjectCollection
+User name coming from PC: DESKTOP-CVQ6D90\Aditya
+User name coming from PC: DESKTOP-CVQ6D90\Aditya
